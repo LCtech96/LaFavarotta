@@ -1,13 +1,13 @@
 'use client'
 
 import { useState } from 'react'
-import { ChefHat, AlertCircle, Leaf, Star } from 'lucide-react'
+import { ChefHat, AlertCircle, Leaf, Star, type LucideIcon } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 interface Highlight {
   id: string
   label: string
-  icon: React.ComponentType<{ size?: number; className?: string }>
+  icon: LucideIcon
 }
 
 const highlights: Highlight[] = [
