@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Calendar } from 'lucide-react'
 import Image from 'next/image'
-import { optimizeBase64Image, isValidBase64Image } from '@/lib/utils'
+import { optimizeBase64Image } from '@/lib/utils'
 
 interface Post {
   id: string
@@ -21,9 +21,9 @@ export function PostsFeed() {
     // Load profile image
     const loadProfileImage = () => {
       const savedProfile = localStorage.getItem('profile_image')
-      if (savedProfile) {
+      if (savedProfile && savedProfile.length > 100) {
         const optimized = optimizeBase64Image(savedProfile)
-        if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+        if (optimized && optimized.length > 100) {
           setProfileImage(optimized)
         } else {
           setProfileImage('/profile-image.png')

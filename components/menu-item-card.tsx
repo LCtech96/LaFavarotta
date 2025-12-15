@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { type MenuItem } from '@/data/menu-data'
-import { formatPrice, optimizeBase64Image, isValidBase64Image } from '@/lib/utils'
+import { formatPrice, optimizeBase64Image } from '@/lib/utils'
 import { useCartStore } from '@/store/cart-store'
 import { MenuItemModal } from './menu-item-modal'
 import { Star, Leaf, AlertCircle } from 'lucide-react'

@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { EditableText } from './editable-text'
-import { optimizeBase64Image, isValidBase64Image } from '@/lib/utils'
+import { optimizeBase64Image } from '@/lib/utils'
 
 export function HomeHero() {
   const [restaurantName, setRestaurantName] = useState('La Favarotta')
@@ -21,15 +21,15 @@ export function HomeHero() {
     if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
     
     // Ottimizza immagini per Android
-    if (savedCover) {
+    if (savedCover && savedCover.length > 100) {
       const optimized = optimizeBase64Image(savedCover)
-      if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+      if (optimized && optimized.length > 100) {
         setCoverImage(optimized)
       }
     }
-    if (savedProfile) {
+    if (savedProfile && savedProfile.length > 100) {
       const optimized = optimizeBase64Image(savedProfile)
-      if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+      if (optimized && optimized.length > 100) {
         setProfileImage(optimized)
       }
     }
@@ -47,15 +47,15 @@ export function HomeHero() {
       if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
       
       // Ottimizza immagini per Android
-      if (savedCover) {
+      if (savedCover && savedCover.length > 100) {
         const optimized = optimizeBase64Image(savedCover)
-        if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+        if (optimized && optimized.length > 100) {
           setCoverImage(optimized)
         }
       }
-      if (savedProfile) {
+      if (savedProfile && savedProfile.length > 100) {
         const optimized = optimizeBase64Image(savedProfile)
-        if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+        if (optimized && optimized.length > 100) {
           setProfileImage(optimized)
         }
       }
