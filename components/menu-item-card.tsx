@@ -66,6 +66,18 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
               src={itemImage}
               alt={item.name}
               className="w-full h-full object-cover"
+              loading="lazy"
+              decoding="async"
+              crossOrigin="anonymous"
+              onError={(e) => {
+                console.error('Error loading image for item', item.id)
+                e.currentTarget.style.display = 'none'
+              }}
+              style={{ 
+                display: 'block',
+                maxWidth: '100%',
+                height: 'auto'
+              }}
             />
           </div>
         )}

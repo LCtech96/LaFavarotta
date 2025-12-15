@@ -82,6 +82,18 @@ export function PostsFeed() {
                     src={profileImage}
                     alt="La Favarotta"
                     className="w-full h-full object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      console.error('Error loading profile image')
+                      e.currentTarget.src = '/profile-image.png'
+                    }}
+                    style={{ 
+                      display: 'block',
+                      width: '100%',
+                      height: '100%'
+                    }}
                   />
                 ) : (
                   <Image
@@ -115,6 +127,18 @@ export function PostsFeed() {
                 src={post.imageUrl}
                 alt={post.title || 'Post'}
                 className="w-full h-full object-cover"
+                loading="lazy"
+                decoding="async"
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  console.error('Error loading post image', post.id)
+                  e.currentTarget.style.display = 'none'
+                }}
+                style={{ 
+                  display: 'block',
+                  maxWidth: '100%',
+                  height: 'auto'
+                }}
               />
             </div>
 

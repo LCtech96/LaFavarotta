@@ -211,6 +211,18 @@ export default function AdminPosts() {
                     src={post.imageUrl}
                     alt={post.title || 'Post'}
                     className="w-full h-64 object-cover"
+                    loading="lazy"
+                    decoding="async"
+                    crossOrigin="anonymous"
+                    onError={(e) => {
+                      console.error('Error loading post image', post.id)
+                      e.currentTarget.style.display = 'none'
+                    }}
+                    style={{ 
+                      display: 'block',
+                      maxWidth: '100%',
+                      height: 'auto'
+                    }}
                   />
                   <button
                     onClick={() => handleDelete(post.id)}

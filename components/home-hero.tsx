@@ -53,6 +53,19 @@ export function HomeHero() {
             src={coverImage}
             alt="La Favarotta - Copertina"
             className="w-full h-full object-cover"
+            loading="eager"
+            decoding="async"
+            crossOrigin="anonymous"
+            onError={(e) => {
+              console.error('Error loading cover image')
+              e.currentTarget.src = '/cover-image.png'
+            }}
+            style={{ 
+              display: 'block',
+              width: '100%',
+              height: '100%',
+              objectFit: 'cover'
+            }}
           />
         ) : (
           <Image
@@ -75,6 +88,19 @@ export function HomeHero() {
                 src={profileImage}
                 alt="La Favarotta - Profilo"
                 className="w-full h-full object-cover"
+                loading="eager"
+                decoding="async"
+                crossOrigin="anonymous"
+                onError={(e) => {
+                  console.error('Error loading profile image')
+                  e.currentTarget.src = '/profile-image.png'
+                }}
+                style={{ 
+                  display: 'block',
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
+                }}
               />
             ) : (
               <Image
