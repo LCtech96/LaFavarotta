@@ -87,9 +87,16 @@ export function PostsFeed() {
     window.addEventListener('storage', handleStorageChange)
     window.addEventListener('focus', handleStorageChange)
     
+    // Forza il refresh ogni 2 secondi per Android (workaround per problemi localStorage)
+    const refreshInterval = setInterval(() => {
+      loadPosts()
+      loadProfileImage()
+    }, 2000)
+    
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('focus', handleStorageChange)
+      clearInterval(refreshInterval)
     }
   }, [])
 

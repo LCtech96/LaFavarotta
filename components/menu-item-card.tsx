@@ -60,10 +60,16 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     window.addEventListener('focus', handleStorageChange)
     window.addEventListener('imageUpdated', handleImageUpdate as EventListener)
     
+    // Forza il refresh ogni 3 secondi per Android (workaround per problemi localStorage)
+    const refreshInterval = setInterval(() => {
+      loadImage()
+    }, 3000)
+    
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('focus', handleStorageChange)
       window.removeEventListener('imageUpdated', handleImageUpdate as EventListener)
+      clearInterval(refreshInterval)
     }
   }, [item.id])
 
