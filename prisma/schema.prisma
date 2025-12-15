@@ -1,0 +1,67 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Category {
+  id          Int      @id @default(autoincrement())
+  name        String
+  order       Int
+  description String?
+  items       MenuItem[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model MenuItem {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  price       Float
+  categoryId  Int
+  category    Category @relation(fields: [categoryId], references: [id])
+  ingredients String[] // Array of ingredients
+  allergens   String[] // Array of allergens
+  isVegan     Boolean  @default(false)
+  isGlutenFree Boolean @default(false)
+  isBestSeller Boolean @default(false)
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model CartItem {
+  id          String   @id @default(uuid())
+  menuItemId Int
+  quantity    Int      @default(1)
+  customizations Customization[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Customization {
+  id         String   @id @default(uuid())
+  cartItemId String
+  cartItem   CartItem @relation(fields: [cartItemId], references: [id], onDelete: Cascade)
+  type       String   // "add" or "remove"
+  ingredient String
+  createdAt  DateTime @default(now())
+}
+
+model Staff {
+  id          Int      @id @default(autoincrement())
+  name        String
+  role        String
+  description String
+  imageUrl    String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+

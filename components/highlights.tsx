@@ -1,0 +1,68 @@
+'use client'
+
+import { useState } from 'react'
+import { ChefHat, AlertCircle, Leaf, Star } from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+interface Highlight {
+  id: string
+  label: string
+  icon: React.ComponentType<{ size?: number; className?: string }>
+}
+
+const highlights: Highlight[] = [
+  { id: 'ingredienti', label: 'Ingredienti', icon: ChefHat },
+  { id: 'allergeni', label: 'Allergeni', icon: AlertCircle },
+  { id: 'vegan', label: 'Vegan/Gluten Free', icon: Leaf },
+  { id: 'bestseller', label: 'Best Seller', icon: Star },
+]
+
+export function Highlights() {
+  const [activeHighlight, setActiveHighlight] = useState<string | null>(null)
+
+  return (
+    <div className="container mx-auto px-4 py-6 md:py-8">
+      <div className="flex items-center justify-center gap-4 md:gap-6 flex-wrap">
+        {highlights.map((highlight) => {
+          const Icon = highlight.icon
+          const isActive = activeHighlight === highlight.id
+
+          return (
+            <button
+              key={highlight.id}
+              onClick={() => setActiveHighlight(isActive ? null : highlight.id)}
+              className={cn(
+                'flex flex-col items-center gap-2 p-4 rounded-full transition-all',
+                'bg-gradient-to-br from-gray-100 to-gray-200 dark:from-gray-800 dark:to-gray-900',
+                'border-2 border-transparent',
+                isActive && 'ring-2 ring-blue-500 dark:ring-blue-400 scale-105',
+                'hover:scale-105 active:scale-95'
+              )}
+              style={{
+                width: '80px',
+                height: '80px',
+              }}
+            >
+              <Icon
+                size={32}
+                className={cn(
+                  'text-gray-700 dark:text-gray-300',
+                  isActive && 'text-blue-600 dark:text-blue-400'
+                )}
+              />
+              <span
+                className={cn(
+                  'text-xs font-medium text-center text-gray-700 dark:text-gray-300',
+                  isActive && 'text-blue-600 dark:text-blue-400'
+                )}
+              >
+                {highlight.label}
+              </span>
+            </button>
+          )
+        })}
+      </div>
+    </div>
+  )
+}
+
