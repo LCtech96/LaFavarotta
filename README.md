@@ -35,9 +35,14 @@ pnpm install
 ```
 
 3. Configura le variabili d'ambiente
-Crea un file `.env` nella root del progetto:
+Crea un file `.env` nella root del progetto copiando da `env.example`:
+```bash
+cp env.example .env
+```
+
+Oppure crea manualmente il file `.env` con:
 ```env
-DATABASE_URL="postgresql://user:password@host:port/database?sslmode=require"
+DATABASE_URL="postgresql://neondb_owner:npg_o2iTpUByG3Wn@ep-crimson-king-a4292tbj-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 NEXT_PUBLIC_WHATSAPP_NUMBER="+393276976442"
 NEXT_PUBLIC_EMAIL="lafavarotta@gmail.com"
 NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristorantelaFavarottaterrasini/?locale=it_IT"
@@ -45,14 +50,19 @@ NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/la_favarotta_ristorante_ter
 NEXT_PUBLIC_MAPS_URL="https://maps.app.goo.gl/jbR99NEc53czT4Hj6"
 ```
 
-4. Configura il database
+4. Configura il database Neon
 ```bash
+# Inizializza neonctl (interattivo)
+npx neonctl@latest init
+
 # Genera il client Prisma
 pnpm prisma generate
 
-# Esegui le migrazioni (se necessario)
-pnpm prisma migrate dev
+# (Opzionale) Push dello schema al database
+pnpm prisma db push
 ```
+
+Vedi `NEON_SETUP.md` per maggiori dettagli sul setup del database Neon.
 
 5. Aggiungi le immagini
 Aggiungi le seguenti immagini nella cartella `public/`:
