@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Upload } from 'lucide-react'
 import Link from 'next/link'
 import { ImageCropper } from '@/components/image-cropper'
+import { optimizeBase64Image } from '@/lib/utils'
 
 export default function AdminGeneralImages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
@@ -34,8 +35,11 @@ export default function AdminGeneralImages() {
   const handleCropComplete = async (croppedImage: string) => {
     if (!croppingType) return
 
+    // Ottimizza l'immagine base64 per Android
+    const optimized = optimizeBase64Image(croppedImage)
+    
     // Salva in localStorage
-    localStorage.setItem(`${croppingType}_image`, croppedImage)
+    localStorage.setItem(`${croppingType}_image`, optimized)
     
     // Trigger custom event for same-tab updates
     window.dispatchEvent(new Event('storage'))
