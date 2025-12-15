@@ -8,6 +8,8 @@ import { menuItems, categories } from '@/data/menu-data'
 import { ImageCropper } from '@/components/image-cropper'
 import { optimizeBase64Image } from '@/lib/utils'
 
+// Admin images page - manage menu item images
+
 export default function AdminImages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
