@@ -100,7 +100,7 @@ export function MenuItemModal({ item, isOpen, onClose }: MenuItemModalProps) {
           {(removedIngredients.length > 0 || addedIngredients.length > 0) && (
             <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
               <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
-                Ingredienti modificati:
+                Ingredienti modificati (clicca per annullare):
               </p>
               <div className="flex flex-wrap gap-2">
                 {/* Ingredienti originali non rimossi */}
@@ -114,23 +114,27 @@ export function MenuItemModal({ item, isOpen, onClose }: MenuItemModalProps) {
                       {ingredient}
                     </span>
                   ))}
-                {/* Ingredienti rimossi (rosso) */}
+                {/* Ingredienti rimossi (rosso) - cliccabili per ripristinare */}
                 {removedIngredients.map((ingredient) => (
-                  <span
+                  <button
                     key={`removed-${ingredient}`}
-                    className="px-2 py-1 text-xs rounded-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 line-through"
+                    onClick={() => toggleRemoveIngredient(ingredient)}
+                    className="px-2 py-1 text-xs rounded-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 line-through hover:bg-red-200 dark:hover:bg-red-800 transition-colors cursor-pointer"
+                    title="Clicca per ripristinare"
                   >
                     {ingredient}
-                  </span>
+                  </button>
                 ))}
-                {/* Ingredienti aggiunti (verde) */}
+                {/* Ingredienti aggiunti (verde) - cliccabili per rimuovere */}
                 {addedIngredients.map((ingredient) => (
-                  <span
+                  <button
                     key={`added-${ingredient}`}
-                    className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                    onClick={() => toggleAddIngredient(ingredient)}
+                    className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300 hover:bg-green-200 dark:hover:bg-green-800 transition-colors cursor-pointer"
+                    title="Clicca per rimuovere"
                   >
                     + {ingredient}
-                  </span>
+                  </button>
                 ))}
               </div>
             </div>
