@@ -18,25 +18,38 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
 
   useEffect(() => {
     // Load image from localStorage
-    const savedImage = localStorage.getItem(`item_image_${item.id}`)
-    if (savedImage) {
-      setItemImage(savedImage)
+    const loadImage = () => {
+      const savedImage = localStorage.getItem(`item_image_${item.id}`)
+      if (savedImage) {
+        setItemImage(savedImage)
+      } else {
+        setItemImage(null)
+      }
     }
+
+    loadImage()
 
     // Listen for storage changes
     const handleStorageChange = () => {
-      const updatedImage = localStorage.getItem(`item_image_${item.id}`)
-      if (updatedImage) {
-        setItemImage(updatedImage)
+      loadImage()
+    }
+
+    // Listen for custom image update events
+    const handleImageUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent
+      if (customEvent.detail?.itemId === item.id) {
+        setItemImage(customEvent.detail.imageUrl)
       }
     }
 
     window.addEventListener('storage', handleStorageChange)
     window.addEventListener('focus', handleStorageChange)
+    window.addEventListener('imageUpdated', handleImageUpdate as EventListener)
     
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('focus', handleStorageChange)
+      window.removeEventListener('imageUpdated', handleImageUpdate as EventListener)
     }
   }, [item.id])
 

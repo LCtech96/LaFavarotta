@@ -12,7 +12,20 @@ export default function AdminImages() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
   const [croppingImage, setCroppingImage] = useState<string | null>(null)
   const [croppingItemId, setCroppingItemId] = useState<number | null>(null)
+  const [itemImages, setItemImages] = useState<Record<number, string>>({})
   const router = useRouter()
+
+  useEffect(() => {
+    // Load all item images
+    const images: Record<number, string> = {}
+    menuItems.forEach(item => {
+      const saved = localStorage.getItem(`item_image_${item.id}`)
+      if (saved) {
+        images[item.id] = saved
+      }
+    })
+    setItemImages(images)
+  }, [])
 
   useEffect(() => {
     const auth = sessionStorage.getItem('adminAuth')
@@ -39,8 +52,17 @@ export default function AdminImages() {
     // Salva in localStorage
     localStorage.setItem(`item_image_${croppingItemId}`, croppedImage)
     
+    // Update local state
+    setItemImages(prev => ({
+      ...prev,
+      [croppingItemId]: croppedImage
+    }))
+    
     // Trigger custom event for same-tab updates
     window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('imageUpdated', { 
+      detail: { itemId: croppingItemId, imageUrl: croppedImage } 
+    }))
 
     // Reset
     setCroppingImage(null)
@@ -143,13 +165,13 @@ export default function AdminImages() {
                     <Upload size={16} />
                     Carica e ritaglia immagine
                   </label>
-                  {localStorage.getItem(`item_image_${item.id}`) && (
+                  {itemImages[item.id] && (
                     <div className="mt-2">
                       <div className="text-sm text-green-600 dark:text-green-400 mb-2">
                         ✓ Immagine caricata
                       </div>
                       <img
-                        src={localStorage.getItem(`item_image_${item.id}`) || ''}
+                        src={itemImages[item.id]}
                         alt={item.name}
                         className="w-full h-32 object-cover rounded-lg"
                       />
