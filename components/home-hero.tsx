@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { EditableText } from './editable-text'
+import { optimizeBase64Image, isValidBase64Image } from '@/lib/utils'
 
 export function HomeHero() {
   const [restaurantName, setRestaurantName] = useState('La Favarotta')
@@ -18,8 +19,20 @@ export function HomeHero() {
     
     if (savedName) setRestaurantName(savedName)
     if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
-    if (savedCover) setCoverImage(savedCover)
-    if (savedProfile) setProfileImage(savedProfile)
+    
+    // Ottimizza immagini per Android
+    if (savedCover) {
+      const optimized = optimizeBase64Image(savedCover)
+      if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+        setCoverImage(optimized)
+      }
+    }
+    if (savedProfile) {
+      const optimized = optimizeBase64Image(savedProfile)
+      if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+        setProfileImage(optimized)
+      }
+    }
   }, [])
 
   // Listen for storage changes
@@ -32,8 +45,20 @@ export function HomeHero() {
       
       if (savedName) setRestaurantName(savedName)
       if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
-      if (savedCover) setCoverImage(savedCover)
-      if (savedProfile) setProfileImage(savedProfile)
+      
+      // Ottimizza immagini per Android
+      if (savedCover) {
+        const optimized = optimizeBase64Image(savedCover)
+        if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+          setCoverImage(optimized)
+        }
+      }
+      if (savedProfile) {
+        const optimized = optimizeBase64Image(savedProfile)
+        if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+          setProfileImage(optimized)
+        }
+      }
     }
 
     window.addEventListener('storage', handleStorageChange)

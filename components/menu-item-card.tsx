@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { type MenuItem } from '@/data/menu-data'
-import { formatPrice } from '@/lib/utils'
+import { formatPrice, optimizeBase64Image, isValidBase64Image } from '@/lib/utils'
 import { useCartStore } from '@/store/cart-store'
 import { MenuItemModal } from './menu-item-modal'
 import { Star, Leaf, AlertCircle } from 'lucide-react'
@@ -21,7 +21,14 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     const loadImage = () => {
       const savedImage = localStorage.getItem(`item_image_${item.id}`)
       if (savedImage) {
-        setItemImage(savedImage)
+        // Ottimizza l'immagine per Android
+        const optimized = optimizeBase64Image(savedImage)
+        if (isValidBase64Image(optimized)) {
+          setItemImage(optimized)
+        } else {
+          console.warn('Invalid base64 image for item', item.id)
+          setItemImage(null)
+        }
       } else {
         setItemImage(null)
       }
@@ -61,7 +68,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
       >
         {/* Item Image */}
         {itemImage && (
-          <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700">
+          <div className="relative w-full h-48 bg-gray-200 dark:bg-gray-700 overflow-hidden">
             <img
               src={itemImage}
               alt={item.name}
@@ -70,13 +77,30 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
               decoding="async"
               crossOrigin="anonymous"
               onError={(e) => {
-                console.error('Error loading image for item', item.id)
-                e.currentTarget.style.display = 'none'
+                console.error('Error loading image for item', item.id, 'on Android')
+                // Rimuovi l'immagine corrotta e prova a ricaricarla
+                const savedImage = localStorage.getItem(`item_image_${item.id}`)
+                if (savedImage) {
+                  const optimized = optimizeBase64Image(savedImage)
+                  if (optimized !== itemImage) {
+                    setItemImage(optimized)
+                  } else {
+                    e.currentTarget.style.display = 'none'
+                  }
+                } else {
+                  e.currentTarget.style.display = 'none'
+                }
+              }}
+              onLoad={() => {
+                // Immagine caricata con successo
+                console.log('Image loaded successfully for item', item.id)
               }}
               style={{ 
                 display: 'block',
-                maxWidth: '100%',
-                height: 'auto'
+                width: '100%',
+                height: '100%',
+                objectFit: 'cover',
+                minHeight: '192px'
               }}
             />
           </div>

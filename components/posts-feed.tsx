@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { Calendar } from 'lucide-react'
 import Image from 'next/image'
+import { optimizeBase64Image, isValidBase64Image } from '@/lib/utils'
 
 interface Post {
   id: string
@@ -21,7 +22,12 @@ export function PostsFeed() {
     const loadProfileImage = () => {
       const savedProfile = localStorage.getItem('profile_image')
       if (savedProfile) {
-        setProfileImage(savedProfile)
+        const optimized = optimizeBase64Image(savedProfile)
+        if (isValidBase64Image(optimized) || !optimized.startsWith('data:')) {
+          setProfileImage(optimized)
+        } else {
+          setProfileImage('/profile-image.png')
+        }
       } else {
         setProfileImage('/profile-image.png')
       }
@@ -34,8 +40,15 @@ export function PostsFeed() {
       if (savedPosts) {
         try {
           const parsed = JSON.parse(savedPosts)
+          // Ottimizza le immagini dei post per Android
+          const optimizedPosts = parsed.map((post: Post) => ({
+            ...post,
+            imageUrl: post.imageUrl.startsWith('data:') 
+              ? optimizeBase64Image(post.imageUrl)
+              : post.imageUrl
+          }))
           // Ordina per data (più recenti prima)
-          const sorted = parsed.sort((a: Post, b: Post) => 
+          const sorted = optimizedPosts.sort((a: Post, b: Post) => 
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )
           setPosts(sorted)
@@ -122,7 +135,7 @@ export function PostsFeed() {
             </div>
 
             {/* Post Image */}
-            <div className="relative w-full aspect-square bg-gray-200 dark:bg-gray-700">
+            <div className="relative w-full aspect-square bg-gray-200 dark:bg-gray-700 overflow-hidden">
               <img
                 src={post.imageUrl}
                 alt={post.title || 'Post'}
@@ -131,13 +144,23 @@ export function PostsFeed() {
                 decoding="async"
                 crossOrigin="anonymous"
                 onError={(e) => {
-                  console.error('Error loading post image', post.id)
-                  e.currentTarget.style.display = 'none'
+                  console.error('Error loading post image', post.id, 'on Android')
+                  // Prova a ottimizzare e ricaricare
+                  const optimized = optimizeBase64Image(post.imageUrl)
+                  if (optimized !== post.imageUrl) {
+                    e.currentTarget.src = optimized
+                  } else {
+                    e.currentTarget.style.display = 'none'
+                  }
+                }}
+                onLoad={() => {
+                  console.log('Post image loaded successfully', post.id)
                 }}
                 style={{ 
                   display: 'block',
-                  maxWidth: '100%',
-                  height: 'auto'
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover'
                 }}
               />
             </div>
