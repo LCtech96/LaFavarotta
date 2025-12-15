@@ -19,17 +19,24 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
   useEffect(() => {
     // Load image from localStorage
     const loadImage = () => {
-      const savedImage = localStorage.getItem(`item_image_${item.id}`)
-      if (savedImage) {
-        // Ottimizza l'immagine per Android
-        const optimized = optimizeBase64Image(savedImage)
-        if (isValidBase64Image(optimized)) {
-          setItemImage(optimized)
+      try {
+        const savedImage = localStorage.getItem(`item_image_${item.id}`)
+        if (savedImage && savedImage.length > 100) {
+          // Ottimizza l'immagine per Android
+          const optimized = optimizeBase64Image(savedImage)
+          // Prova a caricare anche se la validazione fallisce (per compatibilità)
+          if (optimized && optimized.length > 100) {
+            setItemImage(optimized)
+            console.log('Immagine caricata per item', item.id, 'Dimensione:', (optimized.length / 1024).toFixed(2), 'KB')
+          } else {
+            console.warn('Immagine troppo piccola per item', item.id)
+            setItemImage(null)
+          }
         } else {
-          console.warn('Invalid base64 image for item', item.id)
           setItemImage(null)
         }
-      } else {
+      } catch (error) {
+        console.error('Errore nel caricamento immagine per item', item.id, error)
         setItemImage(null)
       }
     }

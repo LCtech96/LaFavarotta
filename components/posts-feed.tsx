@@ -36,25 +36,43 @@ export function PostsFeed() {
     loadProfileImage()
 
     const loadPosts = () => {
-      const savedPosts = localStorage.getItem('posts')
-      if (savedPosts) {
-        try {
+      try {
+        const savedPosts = localStorage.getItem('posts')
+        if (savedPosts) {
           const parsed = JSON.parse(savedPosts)
+          console.log('Posts trovati in localStorage:', parsed.length)
+          
           // Ottimizza le immagini dei post per Android
-          const optimizedPosts = parsed.map((post: Post) => ({
-            ...post,
-            imageUrl: post.imageUrl.startsWith('data:') 
-              ? optimizeBase64Image(post.imageUrl)
-              : post.imageUrl
-          }))
+          const optimizedPosts = parsed
+            .filter((post: Post) => post && post.imageUrl && post.imageUrl.length > 100)
+            .map((post: Post) => ({
+              ...post,
+              imageUrl: post.imageUrl.startsWith('data:') 
+                ? optimizeBase64Image(post.imageUrl)
+                : post.imageUrl
+            }))
+          
+          console.log('Posts ottimizzati:', optimizedPosts.length)
+          
           // Ordina per data (più recenti prima)
           const sorted = optimizedPosts.sort((a: Post, b: Post) => 
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )
-          setPosts(sorted)
-        } catch (e) {
-          console.error('Error loading posts:', e)
+          
+          if (sorted.length > 0) {
+            setPosts(sorted)
+            console.log('Posts caricati con successo:', sorted.length)
+          } else {
+            console.warn('Nessun post valido trovato')
+            setPosts([])
+          }
+        } else {
+          console.log('Nessun post trovato in localStorage')
+          setPosts([])
         }
+      } catch (e) {
+        console.error('Error loading posts:', e)
+        setPosts([])
       }
     }
 
@@ -75,7 +93,20 @@ export function PostsFeed() {
     }
   }, [])
 
+  // Debug: mostra sempre il componente per vedere se i post vengono caricati
   if (posts.length === 0) {
+    // Mostra un messaggio di debug in sviluppo
+    if (process.env.NODE_ENV === 'development') {
+      return (
+        <div className="container mx-auto px-4 py-8 md:py-12">
+          <div className="max-w-2xl mx-auto text-center">
+            <p className="text-gray-600 dark:text-gray-400">
+              Nessun post disponibile. Controlla la console per dettagli.
+            </p>
+          </div>
+        </div>
+      )
+    }
     return null
   }
 

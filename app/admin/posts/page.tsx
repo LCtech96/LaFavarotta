@@ -37,13 +37,19 @@ export default function AdminPosts() {
   }, [router])
 
   const loadPosts = () => {
-    const savedPosts = localStorage.getItem('posts')
-    if (savedPosts) {
-      try {
-        setPosts(JSON.parse(savedPosts))
-      } catch (e) {
-        console.error('Error loading posts:', e)
+    try {
+      const savedPosts = localStorage.getItem('posts')
+      if (savedPosts) {
+        const parsed = JSON.parse(savedPosts)
+        console.log('Posts caricati in admin:', parsed.length)
+        setPosts(parsed)
+      } else {
+        console.log('Nessun post trovato in localStorage')
+        setPosts([])
       }
+    } catch (e) {
+      console.error('Error loading posts:', e)
+      setPosts([])
     }
   }
 
@@ -57,28 +63,54 @@ export default function AdminPosts() {
   }
 
   const handleCropComplete = async (croppedImage: string) => {
-    // Ottimizza l'immagine base64 per Android
-    const optimized = optimizeBase64Image(croppedImage)
-    
-    // Save cropped image
-    const newPost: Post = {
-      id: Date.now().toString(),
-      imageUrl: optimized,
-      description: formData.description,
-      title: formData.title || undefined,
-      createdAt: new Date().toISOString(),
+    try {
+      // Ottimizza l'immagine base64 per Android
+      const optimized = optimizeBase64Image(croppedImage)
+      
+      // Verifica che l'immagine sia valida
+      if (!optimized || optimized.length < 100) {
+        console.error('Immagine ottimizzata troppo piccola o invalida')
+        alert('Errore: immagine non valida. Riprova.')
+        return
+      }
+
+      // Save cropped image
+      const newPost: Post = {
+        id: Date.now().toString(),
+        imageUrl: optimized,
+        description: formData.description,
+        title: formData.title || undefined,
+        createdAt: new Date().toISOString(),
+      }
+
+      const updatedPosts = [newPost, ...posts]
+      setPosts(updatedPosts)
+      
+      // Salva in localStorage
+      const postsJson = JSON.stringify(updatedPosts)
+      localStorage.setItem('posts', postsJson)
+      
+      // Verifica che sia stato salvato
+      const saved = localStorage.getItem('posts')
+      if (!saved || saved !== postsJson) {
+        console.error('Errore nel salvataggio dei post in localStorage')
+        alert('Errore nel salvataggio. Riprova.')
+        return
+      }
+      
+      console.log('Post salvato con successo. Dimensione immagine:', (optimized.length / 1024).toFixed(2), 'KB')
+      console.log('Totale post salvati:', updatedPosts.length)
+
+      // Reset form
+      setFormData({ title: '', description: '' })
+      setCroppingImage(null)
+      setShowForm(false)
+      
+      alert('Post creato con successo!')
+    } catch (error) {
+      console.error('Errore nel salvataggio del post:', error)
+      alert('Errore nel salvataggio del post. Riprova.')
     }
-
-    const updatedPosts = [newPost, ...posts]
-    setPosts(updatedPosts)
-    localStorage.setItem('posts', JSON.stringify(updatedPosts))
-
-    // Reset form
-    setFormData({ title: '', description: '' })
-    setCroppingImage(null)
-    setShowForm(false)
-    
-    alert('Post creato con successo!')
   }
 
   const handleCancelCrop = () => {
