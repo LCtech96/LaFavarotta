@@ -36,20 +36,17 @@ export default function AdminImages() {
   const handleCropComplete = async (croppedImage: string) => {
     if (!croppingItemId) return
 
-    // Convert base64 to blob
-    const response = await fetch(croppedImage)
-    const blob = await response.blob()
-    const file = new File([blob], `item-${croppingItemId}.jpg`, { type: 'image/jpeg' })
-
-    // TODO: Implementare upload reale con API route
-    console.log('Upload cropped image for item', croppingItemId, file)
-    
-    // Salva in localStorage per ora
+    // Salva in localStorage
     localStorage.setItem(`item_image_${croppingItemId}`, croppedImage)
+    
+    // Trigger custom event for same-tab updates
+    window.dispatchEvent(new Event('storage'))
 
     // Reset
     setCroppingImage(null)
     setCroppingItemId(null)
+    
+    alert('Immagine caricata con successo! Le modifiche sono visibili immediatamente nel menu.')
   }
 
   const handleCancelCrop = () => {
@@ -147,8 +144,15 @@ export default function AdminImages() {
                     Carica e ritaglia immagine
                   </label>
                   {localStorage.getItem(`item_image_${item.id}`) && (
-                    <div className="mt-2 text-sm text-green-600 dark:text-green-400">
-                      ✓ Immagine caricata
+                    <div className="mt-2">
+                      <div className="text-sm text-green-600 dark:text-green-400 mb-2">
+                        ✓ Immagine caricata
+                      </div>
+                      <img
+                        src={localStorage.getItem(`item_image_${item.id}`) || ''}
+                        alt={item.name}
+                        className="w-full h-32 object-cover rounded-lg"
+                      />
                     </div>
                   )}
                 </div>

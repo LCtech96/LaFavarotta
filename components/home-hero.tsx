@@ -7,12 +7,19 @@ import { EditableText } from './editable-text'
 export function HomeHero() {
   const [restaurantName, setRestaurantName] = useState('La Favarotta')
   const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
+  const [coverImage, setCoverImage] = useState('/cover-image.png')
+  const [profileImage, setProfileImage] = useState('/profile-image.png')
 
   useEffect(() => {
     const savedName = localStorage.getItem('content_restaurant_name')
     const savedSubtitle = localStorage.getItem('content_restaurant_subtitle')
+    const savedCover = localStorage.getItem('cover_image')
+    const savedProfile = localStorage.getItem('profile_image')
+    
     if (savedName) setRestaurantName(savedName)
     if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
+    if (savedCover) setCoverImage(savedCover)
+    if (savedProfile) setProfileImage(savedProfile)
   }, [])
 
   // Listen for storage changes
@@ -20,12 +27,16 @@ export function HomeHero() {
     const handleStorageChange = () => {
       const savedName = localStorage.getItem('content_restaurant_name')
       const savedSubtitle = localStorage.getItem('content_restaurant_subtitle')
+      const savedCover = localStorage.getItem('cover_image')
+      const savedProfile = localStorage.getItem('profile_image')
+      
       if (savedName) setRestaurantName(savedName)
       if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
+      if (savedCover) setCoverImage(savedCover)
+      if (savedProfile) setProfileImage(savedProfile)
     }
 
     window.addEventListener('storage', handleStorageChange)
-    // Also check localStorage on focus (for same-tab updates)
     window.addEventListener('focus', handleStorageChange)
     return () => {
       window.removeEventListener('storage', handleStorageChange)
@@ -37,13 +48,21 @@ export function HomeHero() {
     <div className="w-full">
       {/* Cover Image */}
       <div className="relative w-full h-64 md:h-96 bg-gray-200 dark:bg-gray-800">
-        <Image
-          src="/cover-image.png"
-          alt="La Favarotta - Copertina"
-          fill
-          className="object-cover"
-          priority
-        />
+        {coverImage.startsWith('data:') ? (
+          <img
+            src={coverImage}
+            alt="La Favarotta - Copertina"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <Image
+            src={coverImage}
+            alt="La Favarotta - Copertina"
+            fill
+            className="object-cover"
+            priority
+          />
+        )}
       </div>
 
       {/* Profile Section */}
@@ -51,12 +70,20 @@ export function HomeHero() {
         <div className="flex flex-col md:flex-row items-start md:items-end gap-4 md:gap-6">
           {/* Profile Image */}
           <div className="relative w-32 h-32 md:w-48 md:h-48 rounded-full border-4 border-white dark:border-gray-900 bg-white dark:bg-gray-900 overflow-hidden shadow-lg">
-            <Image
-              src="/profile-image.png"
-              alt="La Favarotta - Profilo"
-              fill
-              className="object-cover"
-            />
+            {profileImage.startsWith('data:') ? (
+              <img
+                src={profileImage}
+                alt="La Favarotta - Profilo"
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Image
+                src={profileImage}
+                alt="La Favarotta - Profilo"
+                fill
+                className="object-cover"
+              />
+            )}
           </div>
 
           {/* Restaurant Info */}

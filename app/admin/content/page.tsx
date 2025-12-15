@@ -42,6 +42,8 @@ export default function AdminContent() {
 
   const handleSave = (key: string, value: string) => {
     localStorage.setItem(`content_${key}`, value)
+    // Trigger custom event for same-tab updates
+    window.dispatchEvent(new Event('storage'))
     // TODO: Salvare nel database
     console.log('Saved content:', key, value)
   }

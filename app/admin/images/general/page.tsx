@@ -34,23 +34,17 @@ export default function AdminGeneralImages() {
   const handleCropComplete = async (croppedImage: string) => {
     if (!croppingType) return
 
-    // Convert base64 to blob
-    const response = await fetch(croppedImage)
-    const blob = await response.blob()
-    const fileName = croppingType === 'cover' ? 'cover-image.png' : 'profile-image.png'
-    const file = new File([blob], fileName, { type: 'image/png' })
-
-    // TODO: Implementare upload reale con API route
-    console.log('Upload cropped image', croppingType, file)
-    
-    // Salva in localStorage per ora
+    // Salva in localStorage
     localStorage.setItem(`${croppingType}_image`, croppedImage)
+    
+    // Trigger custom event for same-tab updates
+    window.dispatchEvent(new Event('storage'))
 
     // Reset
     setCroppingImage(null)
     setCroppingType(null)
     
-    alert('Immagine caricata con successo! Ricarica la pagina per vedere le modifiche.')
+    alert('Immagine caricata con successo! Le modifiche sono visibili immediatamente.')
   }
 
   const handleCancelCrop = () => {
