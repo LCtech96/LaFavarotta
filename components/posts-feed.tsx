@@ -14,8 +14,21 @@ interface Post {
 
 export function PostsFeed() {
   const [posts, setPosts] = useState<Post[]>([])
+  const [profileImage, setProfileImage] = useState<string>('/profile-image.png')
 
   useEffect(() => {
+    // Load profile image
+    const loadProfileImage = () => {
+      const savedProfile = localStorage.getItem('profile_image')
+      if (savedProfile) {
+        setProfileImage(savedProfile)
+      } else {
+        setProfileImage('/profile-image.png')
+      }
+    }
+
+    loadProfileImage()
+
     const loadPosts = () => {
       const savedPosts = localStorage.getItem('posts')
       if (savedPosts) {
@@ -37,6 +50,7 @@ export function PostsFeed() {
     // Listen for storage changes
     const handleStorageChange = () => {
       loadPosts()
+      loadProfileImage()
     }
 
     window.addEventListener('storage', handleStorageChange)
@@ -62,8 +76,21 @@ export function PostsFeed() {
           >
             {/* Post Header */}
             <div className="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-700">
-              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-bold">
-                LF
+              <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700 flex-shrink-0">
+                {profileImage.startsWith('data:') ? (
+                  <img
+                    src={profileImage}
+                    alt="La Favarotta"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <Image
+                    src={profileImage}
+                    alt="La Favarotta"
+                    fill
+                    className="object-cover"
+                  />
+                )}
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 dark:text-white">
