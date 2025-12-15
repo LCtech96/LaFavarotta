@@ -42,30 +42,37 @@ export function PostsFeed() {
           const parsed = JSON.parse(savedPosts)
           console.log('Posts trovati in localStorage:', parsed.length)
           
-          // Ottimizza le immagini dei post per Android
-          const optimizedPosts = parsed
-            .filter((post: Post) => post && post.imageUrl && post.imageUrl.length > 100)
-            .map((post: Post) => ({
-              ...post,
-              imageUrl: post.imageUrl.startsWith('data:') 
-                ? optimizeBase64Image(post.imageUrl)
-                : post.imageUrl
-            }))
+          // Processa tutti i post, anche se l'immagine sembra piccola
+          const processedPosts = parsed
+            .filter((post: Post) => post && post.id && post.description)
+            .map((post: Post) => {
+              let imageUrl = post.imageUrl || ''
+              
+              // Ottimizza solo se è base64
+              if (imageUrl.startsWith('data:') && imageUrl.length > 50) {
+                imageUrl = optimizeBase64Image(imageUrl)
+              }
+              
+              return {
+                ...post,
+                imageUrl: imageUrl || post.imageUrl
+              }
+            })
           
-          console.log('Posts ottimizzati:', optimizedPosts.length)
+          console.log('Posts processati:', processedPosts.length)
+          console.log('Esempio post:', processedPosts[0] ? {
+            id: processedPosts[0].id,
+            hasImage: !!processedPosts[0].imageUrl,
+            imageLength: processedPosts[0].imageUrl?.length || 0
+          } : 'nessun post')
           
           // Ordina per data (più recenti prima)
-          const sorted = optimizedPosts.sort((a: Post, b: Post) => 
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+          const sorted = processedPosts.sort((a: Post, b: Post) => 
+            new Date(b.createdAt || 0).getTime() - new Date(a.createdAt || 0).getTime()
           )
           
-          if (sorted.length > 0) {
-            setPosts(sorted)
-            console.log('Posts caricati con successo:', sorted.length)
-          } else {
-            console.warn('Nessun post valido trovato')
-            setPosts([])
-          }
+          setPosts(sorted)
+          console.log('Posts impostati nello state:', sorted.length)
         } else {
           console.log('Nessun post trovato in localStorage')
           setPosts([])
@@ -100,20 +107,8 @@ export function PostsFeed() {
     }
   }, [])
 
-  // Debug: mostra sempre il componente per vedere se i post vengono caricati
+  // Mostra sempre il componente se ci sono post o per debug
   if (posts.length === 0) {
-    // Mostra un messaggio di debug in sviluppo
-    if (process.env.NODE_ENV === 'development') {
-      return (
-        <div className="container mx-auto px-4 py-8 md:py-12">
-          <div className="max-w-2xl mx-auto text-center">
-            <p className="text-gray-600 dark:text-gray-400">
-              Nessun post disponibile. Controlla la console per dettagli.
-            </p>
-          </div>
-        </div>
-      )
-    }
     return null
   }
 
@@ -173,35 +168,46 @@ export function PostsFeed() {
             </div>
 
             {/* Post Image */}
-            <div className="relative w-full aspect-square bg-gray-200 dark:bg-gray-700 overflow-hidden">
-              <img
-                src={post.imageUrl}
-                alt={post.title || 'Post'}
-                className="w-full h-full object-cover"
-                loading="lazy"
-                decoding="async"
-                crossOrigin="anonymous"
-                onError={(e) => {
-                  console.error('Error loading post image', post.id, 'on Android')
-                  // Prova a ottimizzare e ricaricare
-                  const optimized = optimizeBase64Image(post.imageUrl)
-                  if (optimized !== post.imageUrl) {
-                    e.currentTarget.src = optimized
-                  } else {
-                    e.currentTarget.style.display = 'none'
-                  }
-                }}
-                onLoad={() => {
-                  console.log('Post image loaded successfully', post.id)
-                }}
-                style={{ 
-                  display: 'block',
-                  width: '100%',
-                  height: '100%',
-                  objectFit: 'cover'
-                }}
-              />
-            </div>
+            {post.imageUrl && (
+              <div className="relative w-full aspect-square bg-gray-200 dark:bg-gray-700 overflow-hidden">
+                <img
+                  src={post.imageUrl}
+                  alt={post.title || 'Post'}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  crossOrigin="anonymous"
+                  onError={(e) => {
+                    console.error('Error loading post image', post.id, 'URL length:', post.imageUrl?.length || 0)
+                    console.error('First 100 chars:', post.imageUrl?.substring(0, 100))
+                    // Prova a ottimizzare e ricaricare
+                    try {
+                      const optimized = optimizeBase64Image(post.imageUrl)
+                      if (optimized && optimized !== post.imageUrl && optimized.length > 50) {
+                        console.log('Retrying with optimized image')
+                        e.currentTarget.src = optimized
+                      } else {
+                        console.error('Cannot optimize image, hiding')
+                        e.currentTarget.style.display = 'none'
+                      }
+                    } catch (err) {
+                      console.error('Error optimizing image:', err)
+                      e.currentTarget.style.display = 'none'
+                    }
+                  }}
+                  onLoad={() => {
+                    console.log('Post image loaded successfully', post.id)
+                  }}
+                  style={{ 
+                    display: 'block',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover',
+                    minHeight: '300px'
+                  }}
+                />
+              </div>
+            )}
 
             {/* Post Content */}
             <div className="p-4 space-y-2">

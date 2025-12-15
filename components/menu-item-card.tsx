@@ -21,16 +21,27 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     const loadImage = () => {
       try {
         const savedImage = localStorage.getItem(`item_image_${item.id}`)
-        if (savedImage && savedImage.length > 100) {
+        if (savedImage) {
           // Ottimizza l'immagine per Android
-          const optimized = optimizeBase64Image(savedImage)
-          // Prova a caricare anche se la validazione fallisce (per compatibilità)
-          if (optimized && optimized.length > 100) {
+          let optimized = savedImage
+          
+          // Se è base64, ottimizzala
+          if (savedImage.startsWith('data:') || savedImage.length > 50) {
+            optimized = optimizeBase64Image(savedImage)
+          }
+          
+          // Prova a caricare l'immagine (anche se piccola, potrebbe essere valida)
+          if (optimized && optimized.length > 50) {
             setItemImage(optimized)
             console.log('Immagine caricata per item', item.id, 'Dimensione:', (optimized.length / 1024).toFixed(2), 'KB')
           } else {
-            console.warn('Immagine troppo piccola per item', item.id)
-            setItemImage(null)
+            console.warn('Immagine troppo piccola o invalida per item', item.id, 'Lunghezza:', optimized?.length || 0)
+            // Prova comunque a caricarla
+            if (optimized) {
+              setItemImage(optimized)
+            } else {
+              setItemImage(null)
+            }
           }
         } else {
           setItemImage(null)
@@ -90,22 +101,32 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
               decoding="async"
               crossOrigin="anonymous"
               onError={(e) => {
-                console.error('Error loading image for item', item.id, 'on Android')
-                // Rimuovi l'immagine corrotta e prova a ricaricarla
-                const savedImage = localStorage.getItem(`item_image_${item.id}`)
-                if (savedImage) {
-                  const optimized = optimizeBase64Image(savedImage)
-                  if (optimized !== itemImage) {
-                    setItemImage(optimized)
+                console.error('Error loading image for item', item.id)
+                console.error('Image URL length:', itemImage.length)
+                console.error('First 100 chars:', itemImage.substring(0, 100))
+                // Prova a ricaricare l'immagine originale da localStorage
+                try {
+                  const savedImage = localStorage.getItem(`item_image_${item.id}`)
+                  if (savedImage) {
+                    const optimized = optimizeBase64Image(savedImage)
+                    if (optimized && optimized !== itemImage && optimized.length > 50) {
+                      console.log('Retrying with optimized image from localStorage')
+                      setItemImage(optimized)
+                      e.currentTarget.src = optimized
+                    } else {
+                      console.error('Cannot optimize, hiding image')
+                      e.currentTarget.style.display = 'none'
+                    }
                   } else {
+                    console.error('No image in localStorage, hiding')
                     e.currentTarget.style.display = 'none'
                   }
-                } else {
+                } catch (err) {
+                  console.error('Error in error handler:', err)
                   e.currentTarget.style.display = 'none'
                 }
               }}
               onLoad={() => {
-                // Immagine caricata con successo
                 console.log('Image loaded successfully for item', item.id)
               }}
               style={{ 
