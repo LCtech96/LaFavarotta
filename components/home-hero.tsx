@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import { EditableText } from './editable-text'
 
 export function HomeHero() {
   return (
