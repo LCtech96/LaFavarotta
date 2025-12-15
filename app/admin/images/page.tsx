@@ -5,10 +5,13 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Upload, X } from 'lucide-react'
 import Link from 'next/link'
 import { menuItems, categories } from '@/data/menu-data'
+import { ImageCropper } from '@/components/image-cropper'
 
 export default function AdminImages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
+  const [croppingImage, setCroppingImage] = useState<string | null>(null)
+  const [croppingItemId, setCroppingItemId] = useState<number | null>(null)
   const router = useRouter()
 
   useEffect(() => {
@@ -20,10 +23,38 @@ export default function AdminImages() {
     }
   }, [router])
 
-  const handleImageUpload = async (itemId: number, file: File) => {
-    // TODO: Implementare upload reale
-    console.log('Upload image for item', itemId, file)
-    // Qui implementerai l'upload vero con API route
+  const handleFileSelect = (itemId: number, file: File) => {
+    const reader = new FileReader()
+    reader.onload = (e) => {
+      const imageDataUrl = e.target?.result as string
+      setCroppingImage(imageDataUrl)
+      setCroppingItemId(itemId)
+    }
+    reader.readAsDataURL(file)
+  }
+
+  const handleCropComplete = async (croppedImage: string) => {
+    if (!croppingItemId) return
+
+    // Convert base64 to blob
+    const response = await fetch(croppedImage)
+    const blob = await response.blob()
+    const file = new File([blob], `item-${croppingItemId}.jpg`, { type: 'image/jpeg' })
+
+    // TODO: Implementare upload reale con API route
+    console.log('Upload cropped image for item', croppingItemId, file)
+    
+    // Salva in localStorage per ora
+    localStorage.setItem(`item_image_${croppingItemId}`, croppedImage)
+
+    // Reset
+    setCroppingImage(null)
+    setCroppingItemId(null)
+  }
+
+  const handleCancelCrop = () => {
+    setCroppingImage(null)
+    setCroppingItemId(null)
   }
 
   if (!isAuthenticated) {
@@ -102,7 +133,7 @@ export default function AdminImages() {
                     onChange={(e) => {
                       const file = e.target.files?.[0]
                       if (file) {
-                        handleImageUpload(item.id, file)
+                        handleFileSelect(item.id, file)
                       }
                     }}
                     className="hidden"
@@ -113,14 +144,28 @@ export default function AdminImages() {
                     className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
                   >
                     <Upload size={16} />
-                    Carica immagine
+                    Carica e ritaglia immagine
                   </label>
+                  {localStorage.getItem(`item_image_${item.id}`) && (
+                    <div className="mt-2 text-sm text-green-600 dark:text-green-400">
+                      ✓ Immagine caricata
+                    </div>
+                  )}
                 </div>
               </div>
             </div>
           ))}
         </div>
       </div>
+
+      {croppingImage && (
+        <ImageCropper
+          image={croppingImage}
+          onCropComplete={handleCropComplete}
+          onCancel={handleCancelCrop}
+          aspectRatio={1}
+        />
+      )}
     </div>
   )
 }

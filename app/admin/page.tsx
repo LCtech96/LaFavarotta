@@ -50,10 +50,23 @@ export default function AdminPanel() {
           >
             <ImageIcon size={48} className="text-blue-600 dark:text-blue-400 mb-4" />
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Gestisci Immagini
+              Immagini Piatti
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
-              Aggiungi, modifica o rimuovi immagini del ristorante, copertina, profilo e piatti
+              Aggiungi e ritaglia immagini per piatti, dolci, bevande e vini
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/images/general"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+          >
+            <ImageIcon size={48} className="text-purple-600 dark:text-purple-400 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Immagini Generali
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Gestisci immagini di copertina e profilo del ristorante
             </p>
           </Link>
 

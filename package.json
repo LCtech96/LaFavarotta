@@ -19,7 +19,8 @@
     "zustand": "^4.5.0",
     "lucide-react": "^0.400.0",
     "clsx": "^2.1.1",
-    "tailwind-merge": "^2.4.0"
+    "tailwind-merge": "^2.4.0",
+    "react-easy-crop": "^5.0.5"
   },
   "devDependencies": {
     "@types/node": "^20.14.0",
