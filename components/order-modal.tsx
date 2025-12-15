@@ -14,12 +14,13 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
   const { items, getTotal, clearCart } = useCartStore()
   const [orderType, setOrderType] = useState<'table' | 'takeaway'>('table')
   const [formData, setFormData] = useState({
+    tableNumber: '',
+    name: '',
+    surname: '',
     deliveryTime: '',
     address: '',
     houseNumber: '',
     phone: '',
-    name: '',
-    surname: '',
   })
 
   if (!isOpen) return null
@@ -42,7 +43,11 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
 
     message += `*Totale: ${formatPrice(getTotal())}*\n\n`
 
-    if (orderType === 'takeaway') {
+    if (orderType === 'table') {
+      message += `*Dati Cliente:*\n`
+      message += `Nome: ${formData.name} ${formData.surname}\n`
+      message += `Tavolo: ${formData.tableNumber}\n`
+    } else {
       message += `*Dati Consegna:*\n`
       message += `Nome: ${formData.name} ${formData.surname}\n`
       message += `Indirizzo: ${formData.address}, ${formData.houseNumber}\n`
@@ -102,6 +107,49 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
               </button>
             </div>
           </div>
+
+          {/* Table Form */}
+          {orderType === 'table' && (
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Numero Tavolo *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.tableNumber}
+                  onChange={(e) => setFormData({ ...formData, tableNumber: e.target.value })}
+                  placeholder="Es: 5"
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Nome *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.name}
+                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Cognome *
+                </label>
+                <input
+                  type="text"
+                  required
+                  value={formData.surname}
+                  onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
+                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                />
+              </div>
+            </div>
+          )}
 
           {/* Takeaway Form */}
           {orderType === 'takeaway' && (
@@ -210,7 +258,10 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
           {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            disabled={orderType === 'takeaway' && (!formData.name || !formData.surname || !formData.phone || !formData.address || !formData.houseNumber)}
+            disabled={
+              (orderType === 'table' && (!formData.tableNumber || !formData.name || !formData.surname)) ||
+              (orderType === 'takeaway' && (!formData.name || !formData.surname || !formData.phone || !formData.address || !formData.houseNumber))
+            }
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Invia ordine via WhatsApp
