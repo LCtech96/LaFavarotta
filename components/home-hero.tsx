@@ -1,9 +1,38 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { EditableText } from './editable-text'
 
 export function HomeHero() {
+  const [restaurantName, setRestaurantName] = useState('La Favarotta')
+  const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
+
+  useEffect(() => {
+    const savedName = localStorage.getItem('content_restaurant_name')
+    const savedSubtitle = localStorage.getItem('content_restaurant_subtitle')
+    if (savedName) setRestaurantName(savedName)
+    if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
+  }, [])
+
+  // Listen for storage changes
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const savedName = localStorage.getItem('content_restaurant_name')
+      const savedSubtitle = localStorage.getItem('content_restaurant_subtitle')
+      if (savedName) setRestaurantName(savedName)
+      if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    // Also check localStorage on focus (for same-tab updates)
+    window.addEventListener('focus', handleStorageChange)
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('focus', handleStorageChange)
+    }
+  }, [])
+
   return (
     <div className="w-full">
       {/* Cover Image */}
@@ -33,17 +62,23 @@ export function HomeHero() {
           {/* Restaurant Info */}
           <div className="flex-1 pb-4">
             <EditableText
-              value="La Favarotta"
+              value={restaurantName}
               onSave={(v) => {
+                setRestaurantName(v)
                 localStorage.setItem('content_restaurant_name', v)
+                // Trigger custom event for same-tab updates
+                window.dispatchEvent(new Event('storage'))
               }}
               tag="h1"
               className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2"
             />
             <EditableText
-              value="Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)"
+              value={restaurantSubtitle}
               onSave={(v) => {
+                setRestaurantSubtitle(v)
                 localStorage.setItem('content_restaurant_subtitle', v)
+                // Trigger custom event for same-tab updates
+                window.dispatchEvent(new Event('storage'))
               }}
               tag="p"
               className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4"

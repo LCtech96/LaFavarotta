@@ -17,8 +17,25 @@ export function RestaurantDescription() {
     if (saved3) setDesc3(saved3)
   }, [])
 
+  // Listen for storage changes to update in real-time
+  useEffect(() => {
+    const handleStorageChange = () => {
+      const saved1 = localStorage.getItem('content_desc1')
+      const saved2 = localStorage.getItem('content_desc2')
+      const saved3 = localStorage.getItem('content_desc3')
+      if (saved1) setDesc1(saved1)
+      if (saved2) setDesc2(saved2)
+      if (saved3) setDesc3(saved3)
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    return () => window.removeEventListener('storage', handleStorageChange)
+  }, [])
+
   const handleSave = (key: string, value: string) => {
     localStorage.setItem(`content_${key}`, value)
+    // Trigger custom event for same-tab updates
+    window.dispatchEvent(new Event('storage'))
     // TODO: Salvare nel database
   }
 
