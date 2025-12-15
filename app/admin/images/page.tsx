@@ -7,7 +7,6 @@ import Link from 'next/link'
 import { menuItems, categories } from '@/data/menu-data'
 import { ImageCropper } from '@/components/image-cropper'
 import { optimizeBase64Image } from '@/lib/utils'
-import { optimizeBase64Image } from '@/lib/utils'
 
 export default function AdminImages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
