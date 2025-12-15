@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Plus, X, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { ImageCropper } from '@/components/image-cropper'
+import { optimizeBase64Image } from '@/lib/utils'
 
 interface Post {
   id: string
@@ -56,10 +57,13 @@ export default function AdminPosts() {
   }
 
   const handleCropComplete = async (croppedImage: string) => {
+    // Ottimizza l'immagine base64 per Android
+    const optimized = optimizeBase64Image(croppedImage)
+    
     // Save cropped image
     const newPost: Post = {
       id: Date.now().toString(),
-      imageUrl: croppedImage,
+      imageUrl: optimized,
       description: formData.description,
       title: formData.title || undefined,
       createdAt: new Date().toISOString(),
