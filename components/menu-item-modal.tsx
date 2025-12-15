@@ -96,6 +96,46 @@ export function MenuItemModal({ item, isOpen, onClose }: MenuItemModalProps) {
             <p className="text-gray-600 dark:text-gray-400">{item.description}</p>
           )}
 
+          {/* Ingredienti modificati in tempo reale */}
+          {(removedIngredients.length > 0 || addedIngredients.length > 0) && (
+            <div className="bg-gray-50 dark:bg-gray-900 rounded-lg p-4 space-y-2">
+              <p className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
+                Ingredienti modificati:
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {/* Ingredienti originali non rimossi */}
+                {item.ingredients
+                  .filter(ing => !removedIngredients.includes(ing))
+                  .map((ingredient) => (
+                    <span
+                      key={ingredient}
+                      className="px-2 py-1 text-xs rounded-full bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300"
+                    >
+                      {ingredient}
+                    </span>
+                  ))}
+                {/* Ingredienti rimossi (rosso) */}
+                {removedIngredients.map((ingredient) => (
+                  <span
+                    key={`removed-${ingredient}`}
+                    className="px-2 py-1 text-xs rounded-full bg-red-100 dark:bg-red-900 text-red-700 dark:text-red-300 line-through"
+                  >
+                    {ingredient}
+                  </span>
+                ))}
+                {/* Ingredienti aggiunti (verde) */}
+                {addedIngredients.map((ingredient) => (
+                  <span
+                    key={`added-${ingredient}`}
+                    className="px-2 py-1 text-xs rounded-full bg-green-100 dark:bg-green-900 text-green-700 dark:text-green-300"
+                  >
+                    + {ingredient}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div>
             <p className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
               Prezzo: {formatPrice(item.price)}
