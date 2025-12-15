@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { LogOut, Image as ImageIcon, FileText } from 'lucide-react'
+import { LogOut, Image as ImageIcon, FileText, PlusSquare } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AdminPanel() {
@@ -80,6 +80,19 @@ export default function AdminPanel() {
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
               Modifica testi, descrizioni e didascalie del sito
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/posts"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+          >
+            <PlusSquare size={48} className="text-orange-600 dark:text-orange-400 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Post del Giorno
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Crea e gestisci i post del piatto del giorno per il feed
             </p>
           </Link>
         </div>

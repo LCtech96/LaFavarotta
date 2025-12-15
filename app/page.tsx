@@ -3,15 +3,9 @@ import { Footer } from '@/components/footer'
 import { HomeHero } from '@/components/home-hero'
 import { Highlights } from '@/components/highlights'
 import { RestaurantDescription } from '@/components/restaurant-description'
-import { EditableText } from '@/components/editable-text'
+import { PostsFeed } from '@/components/posts-feed'
 
 export default function Home() {
-  const handleSaveText = (key: string, value: string) => {
-    // TODO: Salvare nel database
-    console.log('Save text', key, value)
-    localStorage.setItem(`content_${key}`, value)
-  }
-
   return (
     <main className="min-h-screen">
       <Navigation />
@@ -19,6 +13,7 @@ export default function Home() {
         <HomeHero />
         <Highlights />
         <RestaurantDescription />
+        <PostsFeed />
       </div>
       <Footer />
     </main>
