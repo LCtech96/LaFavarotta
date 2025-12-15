@@ -31,12 +31,22 @@ export function HomeHero() {
 
           {/* Restaurant Info */}
           <div className="flex-1 pb-4">
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2">
-              La Favarotta
-            </h1>
-            <p className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4">
-              Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)
-            </p>
+            <EditableText
+              value="La Favarotta"
+              onSave={(v) => {
+                localStorage.setItem('content_restaurant_name', v)
+              }}
+              tag="h1"
+              className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-2"
+            />
+            <EditableText
+              value="Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)"
+              onSave={(v) => {
+                localStorage.setItem('content_restaurant_subtitle', v)
+              }}
+              tag="p"
+              className="text-sm md:text-base text-gray-600 dark:text-gray-400 mb-4"
+            />
           </div>
         </div>
       </div>

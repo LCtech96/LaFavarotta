@@ -22,7 +22,7 @@ export function Highlights() {
 
   return (
     <div className="container mx-auto px-4 py-6 md:py-8">
-      <div className="flex items-center justify-center gap-4 md:gap-6 flex-wrap">
+      <div className="flex items-center justify-center gap-3 md:gap-4">
         {highlights.map((highlight) => {
           const Icon = highlight.icon
           const isActive = activeHighlight === highlight.id
@@ -39,12 +39,12 @@ export function Highlights() {
                 'hover:scale-105 active:scale-95'
               )}
               style={{
-                width: '80px',
-                height: '80px',
+                width: '60px',
+                height: '60px',
               }}
             >
               <Icon
-                size={32}
+                size={20}
                 className={cn(
                   'text-gray-700 dark:text-gray-300',
                   isActive && 'text-blue-600 dark:text-blue-400'
@@ -52,7 +52,7 @@ export function Highlights() {
               />
               <span
                 className={cn(
-                  'text-xs font-medium text-center text-gray-700 dark:text-gray-300',
+                  'text-[10px] font-medium text-center text-gray-700 dark:text-gray-300 leading-tight',
                   isActive && 'text-blue-600 dark:text-blue-400'
                 )}
               >
