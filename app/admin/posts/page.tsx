@@ -72,13 +72,19 @@ export default function AdminPosts() {
     const updatedPosts = [newPost, ...posts]
     setPosts(updatedPosts)
     localStorage.setItem('posts', JSON.stringify(updatedPosts))
+    
+    // Trigger events per aggiornare il sito in tempo reale
+    window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('postsUpdated', { 
+      detail: { posts: updatedPosts } 
+    }))
 
     // Reset form
     setFormData({ title: '', description: '' })
     setCroppingImage(null)
     setShowForm(false)
     
-    alert('Post creato con successo!')
+    alert('Post creato con successo! Il post è ora visibile sulla homepage.')
   }
 
   const handleCancelCrop = () => {
@@ -90,6 +96,12 @@ export default function AdminPosts() {
       const updatedPosts = posts.filter(p => p.id !== postId)
       setPosts(updatedPosts)
       localStorage.setItem('posts', JSON.stringify(updatedPosts))
+      
+      // Trigger events per aggiornare il sito in tempo reale
+      window.dispatchEvent(new Event('storage'))
+      window.dispatchEvent(new CustomEvent('postsUpdated', { 
+        detail: { posts: updatedPosts } 
+      }))
     }
   }
 

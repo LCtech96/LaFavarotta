@@ -82,12 +82,43 @@ export function PostsFeed() {
       loadProfileImage()
     }
 
+    // Listen for custom posts update events
+    const handlePostsUpdate = (e: Event) => {
+      const customEvent = e as CustomEvent
+      if (customEvent.detail?.posts) {
+        // Processa i post per Android
+        const processedPosts = customEvent.detail.posts.map((post: Post) => {
+          if (isAndroid() && post.imageUrl && post.imageUrl.startsWith('data:image')) {
+            if (!blobUrlsRef.current.has(post.id)) {
+              const blobUrl = base64ToBlobUrl(post.imageUrl)
+              if (blobUrl) {
+                blobUrlsRef.current.set(post.id, blobUrl)
+                return { ...post, imageUrl: blobUrl }
+              }
+            } else {
+              return { ...post, imageUrl: blobUrlsRef.current.get(post.id)! }
+            }
+          }
+          return post
+        })
+        const sorted = processedPosts.sort((a: Post, b: Post) => 
+          new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        )
+        setPosts(sorted)
+      } else {
+        loadPosts()
+      }
+      loadProfileImage()
+    }
+
     window.addEventListener('storage', handleStorageChange)
     window.addEventListener('focus', handleStorageChange)
+    window.addEventListener('postsUpdated', handlePostsUpdate as EventListener)
     
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('focus', handleStorageChange)
+      window.removeEventListener('postsUpdated', handlePostsUpdate as EventListener)
       // Pulisci tutti i blob URL quando il componente viene smontato
       blobUrlsRef.current.forEach((url) => {
         URL.revokeObjectURL(url)

@@ -41,14 +41,24 @@ export default function AdminGeneralImages() {
     // Salva in localStorage
     localStorage.setItem(`${croppingType}_image`, optimized)
     
+    // Update local state
+    if (croppingType === 'cover') {
+      setCoverImageUrl(optimized)
+    } else {
+      setProfileImageUrl(optimized)
+    }
+    
     // Trigger custom event for same-tab updates
     window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('imageUpdated', { 
+      detail: { type: croppingType, imageUrl: optimized } 
+    }))
 
     // Reset
     setCroppingImage(null)
     setCroppingType(null)
     
-    alert('Immagine caricata con successo! Le modifiche sono visibili immediatamente.')
+    alert('Immagine caricata con successo! L\'immagine è ora visibile sulla homepage.')
   }
 
   const handleCancelCrop = () => {

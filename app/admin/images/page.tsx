@@ -50,26 +50,29 @@ export default function AdminImages() {
   const handleCropComplete = async (croppedImage: string) => {
     if (!croppingItemId) return
 
+    // Ottimizza l'immagine base64 per Android
+    const optimized = optimizeBase64Image(croppedImage)
+
     // Salva in localStorage
-    localStorage.setItem(`item_image_${croppingItemId}`, croppedImage)
+    localStorage.setItem(`item_image_${croppingItemId}`, optimized)
     
     // Update local state
     setItemImages(prev => ({
       ...prev,
-      [croppingItemId]: croppedImage
+      [croppingItemId]: optimized
     }))
     
     // Trigger custom event for same-tab updates
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('imageUpdated', { 
-      detail: { itemId: croppingItemId, imageUrl: croppedImage } 
+      detail: { itemId: croppingItemId, imageUrl: optimized } 
     }))
 
     // Reset
     setCroppingImage(null)
     setCroppingItemId(null)
     
-    alert('Immagine caricata con successo! Le modifiche sono visibili immediatamente nel menu.')
+    alert('Immagine caricata con successo! L\'immagine è ora visibile nel menu.')
   }
 
   const handleCancelCrop = () => {
