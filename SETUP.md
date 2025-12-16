@@ -46,3 +46,5 @@ NEXT_PUBLIC_MAPS_URL="https://maps.app.goo.gl/jbR99NEc53czT4Hj6"
 3. Aggiungi le immagini in `public/`
 4. Avvia il server: `pnpm dev`
 
+
+

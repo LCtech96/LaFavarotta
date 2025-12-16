@@ -38,3 +38,5 @@ pnpm prisma db push
 
 Nota: Attualmente i dati del menu sono statici in `data/menu-data.ts`, quindi il database non è strettamente necessario per il funzionamento base del sito. Puoi usarlo in futuro per gestire ordini, utenti, ecc.
 
+
+

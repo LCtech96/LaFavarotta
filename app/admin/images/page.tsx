@@ -17,15 +17,41 @@ export default function AdminImages() {
   const router = useRouter()
 
   useEffect(() => {
-    // Load all item images
-    const images: Record<number, string> = {}
-    menuItems.forEach(item => {
-      const saved = localStorage.getItem(`item_image_${item.id}`)
-      if (saved) {
-        images[item.id] = saved
+    // Load all item images from database
+    const loadImages = async () => {
+      const images: Record<number, string> = {}
+      
+      // Carica da database
+      for (const item of menuItems) {
+        try {
+          const response = await fetch(`/api/images/menu-items/${item.id}`)
+          if (response.ok) {
+            const data = await response.json()
+            if (data.imageUrl) {
+              images[item.id] = data.imageUrl
+              // Aggiorna anche localStorage come cache
+              localStorage.setItem(`item_image_${item.id}`, data.imageUrl)
+            }
+          }
+        } catch (error) {
+          console.error(`Error loading image for item ${item.id}:`, error)
+        }
       }
-    })
-    setItemImages(images)
+      
+      // Fallback a localStorage se il database non ha immagini
+      if (Object.keys(images).length === 0) {
+        menuItems.forEach(item => {
+          const saved = localStorage.getItem(`item_image_${item.id}`)
+          if (saved) {
+            images[item.id] = saved
+          }
+        })
+      }
+      
+      setItemImages(images)
+    }
+
+    loadImages()
   }, [])
 
   useEffect(() => {
@@ -50,29 +76,48 @@ export default function AdminImages() {
   const handleCropComplete = async (croppedImage: string) => {
     if (!croppingItemId) return
 
-    // Ottimizza l'immagine base64 per Android
-    const optimized = optimizeBase64Image(croppedImage)
+    try {
+      // Ottimizza l'immagine base64 per Android
+      const optimized = optimizeBase64Image(croppedImage)
 
-    // Salva in localStorage
-    localStorage.setItem(`item_image_${croppingItemId}`, optimized)
-    
-    // Update local state
-    setItemImages(prev => ({
-      ...prev,
-      [croppingItemId]: optimized
-    }))
-    
-    // Trigger custom event for same-tab updates
-    window.dispatchEvent(new Event('storage'))
-    window.dispatchEvent(new CustomEvent('imageUpdated', { 
-      detail: { itemId: croppingItemId, imageUrl: optimized } 
-    }))
+      // Salva nel database tramite API
+      const response = await fetch(`/api/images/menu-items/${croppingItemId}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ imageUrl: optimized }),
+      })
 
-    // Reset
-    setCroppingImage(null)
-    setCroppingItemId(null)
-    
-    alert('Immagine caricata con successo! L\'immagine è ora visibile nel menu.')
+      if (!response.ok) {
+        const error = await response.json()
+        throw new Error(error.error || 'Errore nel salvataggio dell\'immagine')
+      }
+
+      // Salva anche in localStorage come fallback
+      localStorage.setItem(`item_image_${croppingItemId}`, optimized)
+      
+      // Update local state
+      setItemImages(prev => ({
+        ...prev,
+        [croppingItemId]: optimized
+      }))
+      
+      // Trigger custom event for same-tab updates
+      window.dispatchEvent(new Event('storage'))
+      window.dispatchEvent(new CustomEvent('imageUpdated', { 
+        detail: { itemId: croppingItemId, imageUrl: optimized } 
+      }))
+
+      // Reset
+      setCroppingImage(null)
+      setCroppingItemId(null)
+      
+      alert('Immagine caricata con successo! L\'immagine è ora visibile nel menu su tutti i dispositivi.')
+    } catch (error) {
+      console.error('Error saving image:', error)
+      alert('Errore nel caricamento dell\'immagine. Riprova più tardi.')
+    }
   }
 
   const handleCancelCrop = () => {

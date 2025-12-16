@@ -1,4 +1,80 @@
+'use client'
+
+import { useState, useEffect } from 'react'
+import Image from 'next/image'
+import { base64ToBlobUrl, isAndroid } from '@/lib/utils'
+
 export function StaffSection() {
+  const [ownerImage, setOwnerImage] = useState<string | null>(null)
+  const [ownerName, setOwnerName] = useState<string>('Leone Vincenzo')
+  const [ownerDescription, setOwnerDescription] = useState<string>(
+    'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato La Favarotta in un punto di riferimento per la gastronomia siciliana. La sua dedizione alla qualità e all\'autenticità si riflette in ogni piatto che esce dalla nostra cucina.'
+  )
+
+  useEffect(() => {
+    const loadOwnerPhoto = async () => {
+      try {
+        // Prima prova a caricare dal database
+        const response = await fetch('/api/staff/owner')
+        if (response.ok) {
+          const data = await response.json()
+          if (data.imageUrl) {
+            const imageUrl = data.imageUrl
+            localStorage.setItem('owner_image', imageUrl)
+            
+            // Per Android, converti in blob URL
+            if (isAndroid() && imageUrl.startsWith('data:image')) {
+              const blobUrl = base64ToBlobUrl(imageUrl)
+              if (blobUrl) {
+                setOwnerImage(blobUrl)
+              } else {
+                setOwnerImage(imageUrl)
+              }
+            } else {
+              setOwnerImage(imageUrl)
+            }
+            
+            if (data.name) setOwnerName(data.name)
+            if (data.description) setOwnerDescription(data.description)
+            return
+          }
+        }
+      } catch (error) {
+        console.error('Error loading owner photo:', error)
+      }
+
+      // Fallback a localStorage
+      const savedImage = localStorage.getItem('owner_image')
+      if (savedImage) {
+        if (isAndroid() && savedImage.startsWith('data:image')) {
+          const blobUrl = base64ToBlobUrl(savedImage)
+          if (blobUrl) {
+            setOwnerImage(blobUrl)
+          } else {
+            setOwnerImage(savedImage)
+          }
+        } else {
+          setOwnerImage(savedImage)
+        }
+      }
+    }
+
+    loadOwnerPhoto()
+
+    // Listen for storage changes
+    const handleStorageChange = () => {
+      loadOwnerPhoto()
+    }
+
+    window.addEventListener('storage', handleStorageChange)
+    window.addEventListener('focus', handleStorageChange)
+    
+    return () => {
+      window.removeEventListener('storage', handleStorageChange)
+      window.removeEventListener('focus', handleStorageChange)
+    }
+  }, [])
+
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       {/* Restaurant Description */}
@@ -26,16 +102,43 @@ export function StaffSection() {
           Il Titolare
         </h2>
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0 mx-auto md:mx-0"></div>
+          <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0 mx-auto md:mx-0 overflow-hidden relative">
+            {ownerImage ? (
+              ownerImage.startsWith('data:') || ownerImage.startsWith('blob:') ? (
+                <img
+                  src={ownerImage}
+                  alt={ownerName}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  decoding="async"
+                  crossOrigin="anonymous"
+                  onError={(e) => {
+                    console.error('Error loading owner image')
+                    e.currentTarget.style.display = 'none'
+                  }}
+                  style={{ 
+                    display: 'block',
+                    width: '100%',
+                    height: '100%',
+                    objectFit: 'cover'
+                  }}
+                />
+              ) : (
+                <Image
+                  src={ownerImage}
+                  alt={ownerName}
+                  fill
+                  className="object-cover"
+                />
+              )
+            ) : null}
+          </div>
           <div className="flex-1">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
-              Leone Vincenzo
+              {ownerName}
             </h3>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-              Con una passione per la cucina che dura da oltre vent&apos;anni, Leone Vincenzo ha 
-              trasformato La Favarotta in un punto di riferimento per la gastronomia siciliana. 
-              La sua dedizione alla qualità e all&apos;autenticità si riflette in ogni piatto che 
-              esce dalla nostra cucina.
+              {ownerDescription}
             </p>
           </div>
         </div>
@@ -87,4 +190,6 @@ export function StaffSection() {
     </div>
   )
 }
+
+
 

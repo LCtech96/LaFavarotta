@@ -13,43 +13,98 @@ export function HomeHero() {
   const coverBlobUrlRef = useRef<string | null>(null)
   const profileBlobUrlRef = useRef<string | null>(null)
 
-  const loadImages = () => {
-    const savedCover = localStorage.getItem('cover_image')
-    const savedProfile = localStorage.getItem('profile_image')
-    
-    // Carica cover image
-    if (savedCover) {
-      if (isAndroid() && savedCover.startsWith('data:image')) {
-        const blobUrl = base64ToBlobUrl(savedCover)
-        if (blobUrl) {
-          if (coverBlobUrlRef.current) {
-            URL.revokeObjectURL(coverBlobUrlRef.current)
+  const loadImages = async () => {
+    try {
+      // Carica cover image dal database
+      const coverResponse = await fetch('/api/images/general?type=cover')
+      if (coverResponse.ok) {
+        const coverData = await coverResponse.json()
+        if (coverData.imageUrl) {
+          const savedCover = coverData.imageUrl
+          localStorage.setItem('cover_image', savedCover)
+          
+          if (isAndroid() && savedCover.startsWith('data:image')) {
+            const blobUrl = base64ToBlobUrl(savedCover)
+            if (blobUrl) {
+              if (coverBlobUrlRef.current) {
+                URL.revokeObjectURL(coverBlobUrlRef.current)
+              }
+              coverBlobUrlRef.current = blobUrl
+              setCoverImage(blobUrl)
+            } else {
+              setCoverImage(savedCover)
+            }
+          } else {
+            setCoverImage(savedCover)
           }
-          coverBlobUrlRef.current = blobUrl
-          setCoverImage(blobUrl)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading cover image:', error)
+      // Fallback a localStorage
+      const savedCover = localStorage.getItem('cover_image')
+      if (savedCover) {
+        if (isAndroid() && savedCover.startsWith('data:image')) {
+          const blobUrl = base64ToBlobUrl(savedCover)
+          if (blobUrl) {
+            if (coverBlobUrlRef.current) {
+              URL.revokeObjectURL(coverBlobUrlRef.current)
+            }
+            coverBlobUrlRef.current = blobUrl
+            setCoverImage(blobUrl)
+          } else {
+            setCoverImage(savedCover)
+          }
         } else {
           setCoverImage(savedCover)
         }
-      } else {
-        setCoverImage(savedCover)
       }
     }
-    
-    // Carica profile image
-    if (savedProfile) {
-      if (isAndroid() && savedProfile.startsWith('data:image')) {
-        const blobUrl = base64ToBlobUrl(savedProfile)
-        if (blobUrl) {
-          if (profileBlobUrlRef.current) {
-            URL.revokeObjectURL(profileBlobUrlRef.current)
+
+    try {
+      // Carica profile image dal database
+      const profileResponse = await fetch('/api/images/general?type=profile')
+      if (profileResponse.ok) {
+        const profileData = await profileResponse.json()
+        if (profileData.imageUrl) {
+          const savedProfile = profileData.imageUrl
+          localStorage.setItem('profile_image', savedProfile)
+          
+          if (isAndroid() && savedProfile.startsWith('data:image')) {
+            const blobUrl = base64ToBlobUrl(savedProfile)
+            if (blobUrl) {
+              if (profileBlobUrlRef.current) {
+                URL.revokeObjectURL(profileBlobUrlRef.current)
+              }
+              profileBlobUrlRef.current = blobUrl
+              setProfileImage(blobUrl)
+            } else {
+              setProfileImage(savedProfile)
+            }
+          } else {
+            setProfileImage(savedProfile)
           }
-          profileBlobUrlRef.current = blobUrl
-          setProfileImage(blobUrl)
+        }
+      }
+    } catch (error) {
+      console.error('Error loading profile image:', error)
+      // Fallback a localStorage
+      const savedProfile = localStorage.getItem('profile_image')
+      if (savedProfile) {
+        if (isAndroid() && savedProfile.startsWith('data:image')) {
+          const blobUrl = base64ToBlobUrl(savedProfile)
+          if (blobUrl) {
+            if (profileBlobUrlRef.current) {
+              URL.revokeObjectURL(profileBlobUrlRef.current)
+            }
+            profileBlobUrlRef.current = blobUrl
+            setProfileImage(blobUrl)
+          } else {
+            setProfileImage(savedProfile)
+          }
         } else {
           setProfileImage(savedProfile)
         }
-      } else {
-        setProfileImage(savedProfile)
       }
     }
   }
@@ -61,7 +116,7 @@ export function HomeHero() {
     if (savedName) setRestaurantName(savedName)
     if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
     
-    loadImages()
+    loadImages().catch(console.error)
   }, [])
 
   // Listen for storage changes
@@ -73,7 +128,7 @@ export function HomeHero() {
       if (savedName) setRestaurantName(savedName)
       if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
       
-      loadImages()
+      loadImages().catch(console.error)
     }
 
     window.addEventListener('storage', handleStorageChange)

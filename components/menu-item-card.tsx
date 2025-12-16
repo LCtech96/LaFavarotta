@@ -18,8 +18,40 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
   const blobUrlRef = useRef<string | null>(null)
 
   useEffect(() => {
-    // Load image from localStorage
-    const loadImage = () => {
+    // Load image from database with localStorage fallback
+    const loadImage = async () => {
+      try {
+        // Prima prova a caricare dal database
+        const response = await fetch(`/api/images/menu-items/${item.id}`)
+        if (response.ok) {
+          const data = await response.json()
+          if (data.imageUrl) {
+            const imageUrl = data.imageUrl
+            // Salva in localStorage come cache
+            localStorage.setItem(`item_image_${item.id}`, imageUrl)
+            
+            // Per Android, prova a convertire in blob URL
+            if (isAndroid() && imageUrl.startsWith('data:image')) {
+              const blobUrl = base64ToBlobUrl(imageUrl)
+              if (blobUrl) {
+                // Pulisci il blob URL precedente se esiste
+                if (blobUrlRef.current) {
+                  URL.revokeObjectURL(blobUrlRef.current)
+                }
+                blobUrlRef.current = blobUrl
+                setItemImage(blobUrl)
+                return
+              }
+            }
+            setItemImage(imageUrl)
+            return
+          }
+        }
+      } catch (error) {
+        console.error(`Error loading image for item ${item.id}:`, error)
+      }
+
+      // Fallback a localStorage
       const savedImage = localStorage.getItem(`item_image_${item.id}`)
       if (savedImage) {
         // Per Android, prova a convertire in blob URL
@@ -104,6 +136,7 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
               className="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
+              crossOrigin="anonymous"
               onError={(e) => {
                 console.error('Error loading image for item', item.id)
                 // Su Android, prova a ricaricare da localStorage come base64
