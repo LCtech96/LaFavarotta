@@ -13,82 +13,6 @@ export function formatPrice(price: number): string {
 }
 
 /**
- * Riduce la qualità di un'immagine base64 per Android
- * Android può avere problemi con immagini base64 troppo grandi
- */
-function compressBase64Image(base64: string, maxSizeKB: number = 500): Promise<string> {
-  return new Promise((resolve) => {
-    if (!base64 || !base64.startsWith('data:image')) {
-      resolve(base64)
-      return
-    }
-
-    // Estrai la parte base64
-    const base64Part = base64.split('base64,')[1]
-    if (!base64Part) {
-      resolve(base64)
-      return
-    }
-
-    // Calcola dimensione approssimativa in KB
-    const sizeKB = (base64Part.length * 3) / 4 / 1024
-
-    // Se l'immagine è già abbastanza piccola, non comprimere
-    if (sizeKB <= maxSizeKB) {
-      resolve(base64)
-      return
-    }
-
-    // Crea un'immagine per ridimensionarla
-    const img = new Image()
-    img.onload = () => {
-      const canvas = document.createElement('canvas')
-      const ctx = canvas.getContext('2d')
-      
-      if (!ctx) {
-        resolve(base64)
-        return
-      }
-
-      // Calcola nuove dimensioni mantenendo aspect ratio
-      let width = img.width
-      let height = img.height
-      const maxDimension = 800 // Max 800px per lato
-
-      if (width > maxDimension || height > maxDimension) {
-        if (width > height) {
-          height = (height * maxDimension) / width
-          width = maxDimension
-        } else {
-          width = (width * maxDimension) / height
-          height = maxDimension
-        }
-      }
-
-      canvas.width = width
-      canvas.height = height
-
-      // Disegna l'immagine ridimensionata
-      ctx.drawImage(img, 0, 0, width, height)
-
-      // Converti in base64 con qualità ridotta
-      const quality = 0.8
-      const mimeType = base64.match(/data:image\/([^;]+)/)?.[1] || 'jpeg'
-      const compressed = canvas.toDataURL(`image/${mimeType}`, quality)
-      
-      resolve(compressed)
-    }
-
-    img.onerror = () => {
-      // Se fallisce, ritorna l'originale
-      resolve(base64)
-    }
-
-    img.src = base64
-  })
-}
-
-/**
  * Valida e ottimizza un'immagine base64 per Android
  * Rimuove eventuali caratteri problematici e assicura il formato corretto
  */
@@ -112,15 +36,43 @@ export function optimizeBase64Image(base64: string): string {
 }
 
 /**
- * Ottimizza e comprime un'immagine base64 per Android (async)
+ * Converte base64 in blob URL per migliorare compatibilità Android
  */
-export async function optimizeAndCompressBase64Image(base64: string): Promise<string> {
-  const optimized = optimizeBase64Image(base64)
-  // Comprimi solo se necessario (in background, non blocca)
-  if (typeof window !== 'undefined') {
-    return compressBase64Image(optimized)
+export function base64ToBlobUrl(base64: string): string | null {
+  if (typeof window === 'undefined') return null
+  if (!base64 || !base64.startsWith('data:image')) return null
+
+  try {
+    // Estrai il tipo MIME e i dati base64
+    const matches = base64.match(/^data:image\/([a-z]+);base64,(.+)$/i)
+    if (!matches || matches.length !== 3) return null
+
+    const mimeType = matches[1]
+    const base64Data = matches[2]
+
+    // Converti base64 in binary
+    const byteCharacters = atob(base64Data)
+    const byteNumbers = new Array(byteCharacters.length)
+    for (let i = 0; i < byteCharacters.length; i++) {
+      byteNumbers[i] = byteCharacters.charCodeAt(i)
+    }
+    const byteArray = new Uint8Array(byteNumbers)
+    const blob = new Blob([byteArray], { type: `image/${mimeType}` })
+
+    // Crea blob URL
+    return URL.createObjectURL(blob)
+  } catch (error) {
+    console.error('Error converting base64 to blob URL:', error)
+    return null
   }
-  return optimized
+}
+
+/**
+ * Rileva se il dispositivo è Android
+ */
+export function isAndroid(): boolean {
+  if (typeof window === 'undefined') return false
+  return /Android/i.test(navigator.userAgent)
 }
 
 /**

@@ -8,8 +8,6 @@ import { menuItems, categories } from '@/data/menu-data'
 import { ImageCropper } from '@/components/image-cropper'
 import { optimizeBase64Image } from '@/lib/utils'
 
-// Admin images page - manage menu item images
-
 export default function AdminImages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
@@ -52,51 +50,26 @@ export default function AdminImages() {
   const handleCropComplete = async (croppedImage: string) => {
     if (!croppingItemId) return
 
-    try {
-      // Ottimizza l'immagine base64 per Android
-      const optimized = optimizeBase64Image(croppedImage)
-      
-      // Verifica che l'ottimizzazione sia andata a buon fine
-      if (!optimized || optimized.length < 100) {
-        console.error('Immagine ottimizzata troppo piccola o invalida')
-        alert('Errore: immagine non valida. Riprova.')
-        return
-      }
+    // Salva in localStorage
+    localStorage.setItem(`item_image_${croppingItemId}`, croppedImage)
+    
+    // Update local state
+    setItemImages(prev => ({
+      ...prev,
+      [croppingItemId]: croppedImage
+    }))
+    
+    // Trigger custom event for same-tab updates
+    window.dispatchEvent(new Event('storage'))
+    window.dispatchEvent(new CustomEvent('imageUpdated', { 
+      detail: { itemId: croppingItemId, imageUrl: croppedImage } 
+    }))
 
-      // Salva in localStorage
-      localStorage.setItem(`item_image_${croppingItemId}`, optimized)
-      
-      // Verifica che sia stata salvata
-      const saved = localStorage.getItem(`item_image_${croppingItemId}`)
-      if (!saved || saved !== optimized) {
-        console.error('Errore nel salvataggio in localStorage')
-        alert('Errore nel salvataggio. Riprova.')
-        return
-      }
-      
-      console.log('Immagine salvata con successo per item', croppingItemId, 'Dimensione:', (optimized.length / 1024).toFixed(2), 'KB')
-      
-      // Update local state
-      setItemImages(prev => ({
-        ...prev,
-        [croppingItemId]: optimized
-      }))
-      
-      // Trigger custom event for same-tab updates
-      window.dispatchEvent(new Event('storage'))
-      window.dispatchEvent(new CustomEvent('imageUpdated', { 
-        detail: { itemId: croppingItemId, imageUrl: optimized } 
-      }))
-
-      // Reset
-      setCroppingImage(null)
-      setCroppingItemId(null)
-      
-      alert('Immagine caricata con successo! Le modifiche sono visibili immediatamente nel menu.')
-    } catch (error) {
-      console.error('Errore nel salvataggio immagine:', error)
-      alert('Errore nel salvataggio dell\'immagine. Riprova.')
-    }
+    // Reset
+    setCroppingImage(null)
+    setCroppingItemId(null)
+    
+    alert('Immagine caricata con successo! Le modifiche sono visibili immediatamente nel menu.')
   }
 
   const handleCancelCrop = () => {

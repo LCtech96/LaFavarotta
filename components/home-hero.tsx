@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
 import { EditableText } from './editable-text'
-import { optimizeBase64Image } from '@/lib/utils'
 
 export function HomeHero() {
   const [restaurantName, setRestaurantName] = useState('La Favarotta')
@@ -19,20 +18,8 @@ export function HomeHero() {
     
     if (savedName) setRestaurantName(savedName)
     if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
-    
-    // Ottimizza immagini per Android
-    if (savedCover && savedCover.length > 100) {
-      const optimized = optimizeBase64Image(savedCover)
-      if (optimized && optimized.length > 100) {
-        setCoverImage(optimized)
-      }
-    }
-    if (savedProfile && savedProfile.length > 100) {
-      const optimized = optimizeBase64Image(savedProfile)
-      if (optimized && optimized.length > 100) {
-        setProfileImage(optimized)
-      }
-    }
+    if (savedCover) setCoverImage(savedCover)
+    if (savedProfile) setProfileImage(savedProfile)
   }, [])
 
   // Listen for storage changes
@@ -45,20 +32,8 @@ export function HomeHero() {
       
       if (savedName) setRestaurantName(savedName)
       if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
-      
-      // Ottimizza immagini per Android
-      if (savedCover && savedCover.length > 100) {
-        const optimized = optimizeBase64Image(savedCover)
-        if (optimized && optimized.length > 100) {
-          setCoverImage(optimized)
-        }
-      }
-      if (savedProfile && savedProfile.length > 100) {
-        const optimized = optimizeBase64Image(savedProfile)
-        if (optimized && optimized.length > 100) {
-          setProfileImage(optimized)
-        }
-      }
+      if (savedCover) setCoverImage(savedCover)
+      if (savedProfile) setProfileImage(savedProfile)
     }
 
     window.addEventListener('storage', handleStorageChange)

@@ -1,9 +1,9 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { type MenuItem } from '@/data/menu-data'
-import { formatPrice, optimizeBase64Image } from '@/lib/utils'
+import { formatPrice, base64ToBlobUrl, isAndroid } from '@/lib/utils'
 import { useCartStore } from '@/store/cart-store'
 import { MenuItemModal } from './menu-item-modal'
 import { Star, Leaf, AlertCircle } from 'lucide-react'
@@ -15,39 +15,31 @@ interface MenuItemCardProps {
 export function MenuItemCard({ item }: MenuItemCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [itemImage, setItemImage] = useState<string | null>(null)
+  const blobUrlRef = useRef<string | null>(null)
 
   useEffect(() => {
     // Load image from localStorage
     const loadImage = () => {
-      try {
-        const savedImage = localStorage.getItem(`item_image_${item.id}`)
-        if (savedImage) {
-          // Ottimizza l'immagine per Android
-          let optimized = savedImage
-          
-          // Se è base64, ottimizzala
-          if (savedImage.startsWith('data:') || savedImage.length > 50) {
-            optimized = optimizeBase64Image(savedImage)
-          }
-          
-          // Prova a caricare l'immagine (anche se piccola, potrebbe essere valida)
-          if (optimized && optimized.length > 50) {
-            setItemImage(optimized)
-            console.log('Immagine caricata per item', item.id, 'Dimensione:', (optimized.length / 1024).toFixed(2), 'KB')
-          } else {
-            console.warn('Immagine troppo piccola o invalida per item', item.id, 'Lunghezza:', optimized?.length || 0)
-            // Prova comunque a caricarla
-            if (optimized) {
-              setItemImage(optimized)
-            } else {
-              setItemImage(null)
+      const savedImage = localStorage.getItem(`item_image_${item.id}`)
+      if (savedImage) {
+        // Per Android, prova a convertire in blob URL
+        if (isAndroid() && savedImage.startsWith('data:image')) {
+          const blobUrl = base64ToBlobUrl(savedImage)
+          if (blobUrl) {
+            // Pulisci il blob URL precedente se esiste
+            if (blobUrlRef.current) {
+              URL.revokeObjectURL(blobUrlRef.current)
             }
+            blobUrlRef.current = blobUrl
+            setItemImage(blobUrl)
+          } else {
+            // Fallback a base64 se la conversione fallisce
+            setItemImage(savedImage)
           }
         } else {
-          setItemImage(null)
+          setItemImage(savedImage)
         }
-      } catch (error) {
-        console.error('Errore nel caricamento immagine per item', item.id, error)
+      } else {
         setItemImage(null)
       }
     }
@@ -63,7 +55,22 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     const handleImageUpdate = (e: Event) => {
       const customEvent = e as CustomEvent
       if (customEvent.detail?.itemId === item.id) {
-        setItemImage(customEvent.detail.imageUrl)
+        const imageUrl = customEvent.detail.imageUrl
+        // Per Android, converti in blob URL
+        if (isAndroid() && imageUrl.startsWith('data:image')) {
+          const blobUrl = base64ToBlobUrl(imageUrl)
+          if (blobUrl) {
+            if (blobUrlRef.current) {
+              URL.revokeObjectURL(blobUrlRef.current)
+            }
+            blobUrlRef.current = blobUrl
+            setItemImage(blobUrl)
+          } else {
+            setItemImage(imageUrl)
+          }
+        } else {
+          setItemImage(imageUrl)
+        }
       }
     }
 
@@ -71,16 +78,14 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     window.addEventListener('focus', handleStorageChange)
     window.addEventListener('imageUpdated', handleImageUpdate as EventListener)
     
-    // Forza il refresh ogni 3 secondi per Android (workaround per problemi localStorage)
-    const refreshInterval = setInterval(() => {
-      loadImage()
-    }, 3000)
-    
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('focus', handleStorageChange)
       window.removeEventListener('imageUpdated', handleImageUpdate as EventListener)
-      clearInterval(refreshInterval)
+      // Pulisci blob URL quando il componente viene smontato
+      if (blobUrlRef.current) {
+        URL.revokeObjectURL(blobUrlRef.current)
+      }
     }
   }, [item.id])
 
@@ -99,42 +104,29 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
               className="w-full h-full object-cover"
               loading="lazy"
               decoding="async"
-              crossOrigin="anonymous"
               onError={(e) => {
                 console.error('Error loading image for item', item.id)
-                console.error('Image URL length:', itemImage.length)
-                console.error('First 100 chars:', itemImage.substring(0, 100))
-                // Prova a ricaricare l'immagine originale da localStorage
-                try {
+                // Su Android, prova a ricaricare da localStorage come base64
+                if (isAndroid()) {
                   const savedImage = localStorage.getItem(`item_image_${item.id}`)
-                  if (savedImage) {
-                    const optimized = optimizeBase64Image(savedImage)
-                    if (optimized && optimized !== itemImage && optimized.length > 50) {
-                      console.log('Retrying with optimized image from localStorage')
-                      setItemImage(optimized)
-                      e.currentTarget.src = optimized
-                    } else {
-                      console.error('Cannot optimize, hiding image')
-                      e.currentTarget.style.display = 'none'
-                    }
+                  if (savedImage && savedImage.startsWith('data:image')) {
+                    // Prova direttamente con base64 come fallback
+                    e.currentTarget.src = savedImage
                   } else {
-                    console.error('No image in localStorage, hiding')
                     e.currentTarget.style.display = 'none'
                   }
-                } catch (err) {
-                  console.error('Error in error handler:', err)
+                } else {
                   e.currentTarget.style.display = 'none'
                 }
               }}
               onLoad={() => {
-                console.log('Image loaded successfully for item', item.id)
+                // Immagine caricata con successo
               }}
               style={{ 
                 display: 'block',
                 width: '100%',
                 height: '100%',
-                objectFit: 'cover',
-                minHeight: '192px'
+                objectFit: 'cover'
               }}
             />
           </div>

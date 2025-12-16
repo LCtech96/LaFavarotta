@@ -95,34 +95,8 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
     // paste generated rotate image at the top left corner
     ctx.putImageData(data, 0, 0)
 
-    // Limita la dimensione massima per Android (max 1200px per lato)
-    let finalWidth = pixelCrop.width
-    let finalHeight = pixelCrop.height
-    const maxDimension = 1200
-
-    if (finalWidth > maxDimension || finalHeight > maxDimension) {
-      if (finalWidth > finalHeight) {
-        finalHeight = (finalHeight * maxDimension) / finalWidth
-        finalWidth = maxDimension
-      } else {
-        finalWidth = (finalWidth * maxDimension) / finalHeight
-        finalHeight = maxDimension
-      }
-
-      // Crea un nuovo canvas con dimensioni ridotte
-      const resizedCanvas = document.createElement('canvas')
-      const resizedCtx = resizedCanvas.getContext('2d')
-      if (resizedCtx) {
-        resizedCanvas.width = finalWidth
-        resizedCanvas.height = finalHeight
-        resizedCtx.drawImage(canvas, 0, 0, finalWidth, finalHeight)
-        // Usa qualità 0.85 per Android (bilanciamento qualità/dimensione)
-        return resizedCanvas.toDataURL('image/jpeg', 0.85)
-      }
-    }
-
-    // As Base64 string con qualità ottimizzata per Android
-    return canvas.toDataURL('image/jpeg', 0.85)
+    // As Base64 string
+    return canvas.toDataURL('image/jpeg', 0.9)
   }
 
   const handleCrop = async () => {

@@ -1,7 +1,3 @@
-'use client'
-
-import Image from 'next/image'
-
 export function StaffSection() {
   return (
     <div className="max-w-4xl mx-auto space-y-12">
@@ -29,16 +25,8 @@ export function StaffSection() {
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
           Il Titolare
         </h2>
-        <div className="flex flex-col md:flex-row gap-6 items-center md:items-start">
-          <div className="relative w-48 h-48 md:w-56 md:h-56 rounded-full overflow-hidden flex-shrink-0 mx-auto md:mx-0 border-4 border-gray-200 dark:border-gray-700 shadow-lg">
-            <Image
-              src="/il-titolare-image.png"
-              alt="Leone Vincenzo - Titolare"
-              fill
-              className="object-cover"
-              priority
-            />
-          </div>
+        <div className="flex flex-col md:flex-row gap-6">
+          <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0 mx-auto md:mx-0"></div>
           <div className="flex-1">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               Leone Vincenzo
