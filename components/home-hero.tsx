@@ -1,25 +1,67 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import Image from 'next/image'
 import { EditableText } from './editable-text'
+import { base64ToBlobUrl, isAndroid } from '@/lib/utils'
 
 export function HomeHero() {
   const [restaurantName, setRestaurantName] = useState('La Favarotta')
   const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
   const [coverImage, setCoverImage] = useState('/cover-image.png')
   const [profileImage, setProfileImage] = useState('/profile-image.png')
+  const coverBlobUrlRef = useRef<string | null>(null)
+  const profileBlobUrlRef = useRef<string | null>(null)
+
+  const loadImages = () => {
+    const savedCover = localStorage.getItem('cover_image')
+    const savedProfile = localStorage.getItem('profile_image')
+    
+    // Carica cover image
+    if (savedCover) {
+      if (isAndroid() && savedCover.startsWith('data:image')) {
+        const blobUrl = base64ToBlobUrl(savedCover)
+        if (blobUrl) {
+          if (coverBlobUrlRef.current) {
+            URL.revokeObjectURL(coverBlobUrlRef.current)
+          }
+          coverBlobUrlRef.current = blobUrl
+          setCoverImage(blobUrl)
+        } else {
+          setCoverImage(savedCover)
+        }
+      } else {
+        setCoverImage(savedCover)
+      }
+    }
+    
+    // Carica profile image
+    if (savedProfile) {
+      if (isAndroid() && savedProfile.startsWith('data:image')) {
+        const blobUrl = base64ToBlobUrl(savedProfile)
+        if (blobUrl) {
+          if (profileBlobUrlRef.current) {
+            URL.revokeObjectURL(profileBlobUrlRef.current)
+          }
+          profileBlobUrlRef.current = blobUrl
+          setProfileImage(blobUrl)
+        } else {
+          setProfileImage(savedProfile)
+        }
+      } else {
+        setProfileImage(savedProfile)
+      }
+    }
+  }
 
   useEffect(() => {
     const savedName = localStorage.getItem('content_restaurant_name')
     const savedSubtitle = localStorage.getItem('content_restaurant_subtitle')
-    const savedCover = localStorage.getItem('cover_image')
-    const savedProfile = localStorage.getItem('profile_image')
     
     if (savedName) setRestaurantName(savedName)
     if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
-    if (savedCover) setCoverImage(savedCover)
-    if (savedProfile) setProfileImage(savedProfile)
+    
+    loadImages()
   }, [])
 
   // Listen for storage changes
@@ -27,13 +69,11 @@ export function HomeHero() {
     const handleStorageChange = () => {
       const savedName = localStorage.getItem('content_restaurant_name')
       const savedSubtitle = localStorage.getItem('content_restaurant_subtitle')
-      const savedCover = localStorage.getItem('cover_image')
-      const savedProfile = localStorage.getItem('profile_image')
       
       if (savedName) setRestaurantName(savedName)
       if (savedSubtitle) setRestaurantSubtitle(savedSubtitle)
-      if (savedCover) setCoverImage(savedCover)
-      if (savedProfile) setProfileImage(savedProfile)
+      
+      loadImages()
     }
 
     window.addEventListener('storage', handleStorageChange)
@@ -41,6 +81,13 @@ export function HomeHero() {
     return () => {
       window.removeEventListener('storage', handleStorageChange)
       window.removeEventListener('focus', handleStorageChange)
+      // Pulisci blob URL quando il componente viene smontato
+      if (coverBlobUrlRef.current) {
+        URL.revokeObjectURL(coverBlobUrlRef.current)
+      }
+      if (profileBlobUrlRef.current) {
+        URL.revokeObjectURL(profileBlobUrlRef.current)
+      }
     }
   }, [])
 
