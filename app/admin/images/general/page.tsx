@@ -41,13 +41,6 @@ export default function AdminGeneralImages() {
     // Salva in localStorage
     localStorage.setItem(`${croppingType}_image`, optimized)
     
-    // Update local state
-    if (croppingType === 'cover') {
-      setCoverImageUrl(optimized)
-    } else {
-      setProfileImageUrl(optimized)
-    }
-    
     // Trigger custom event for same-tab updates
     window.dispatchEvent(new Event('storage'))
     window.dispatchEvent(new CustomEvent('imageUpdated', { 
