@@ -1,20 +1,67 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { menuItems, categories, type MenuItem } from '@/data/menu-data'
 import { MenuItemCard } from './menu-item-card'
 
+type MenuItemOverrides = {
+  name?: string
+  price?: number
+  hidden?: boolean
+}
+
 export function MenuList() {
   const [selectedCategory, setSelectedCategory] = useState<number | null>(null)
+  const [overrides, setOverrides] = useState<Record<number, MenuItemOverrides>>(
+    {}
+  )
 
-  const filteredItems = selectedCategory !== null
-    ? menuItems.filter(item => item.categoryId === selectedCategory)
-    : menuItems
+  // Applica override a menuItems statici
+  const effectiveMenuItems: MenuItem[] = menuItems
+    .map((item) => {
+      const override = overrides[item.id]
+      if (!override) return item
 
-  const itemsByCategory = categories.map(category => ({
+      return {
+        ...item,
+        name: override.name ?? item.name,
+        price: override.price ?? item.price,
+      }
+    })
+    // Rimuovi i piatti marcati come hidden
+    .filter((item) => {
+      const override = overrides[item.id]
+      return !override?.hidden
+    })
+
+  const filteredItems =
+    selectedCategory !== null
+      ? effectiveMenuItems.filter(
+          (item) => item.categoryId === selectedCategory
+        )
+      : effectiveMenuItems
+
+  const itemsByCategory = categories.map((category) => ({
     category,
-    items: menuItems.filter(item => item.categoryId === category.id),
+    items: effectiveMenuItems.filter((item) => item.categoryId === category.id),
   }))
+
+  useEffect(() => {
+    const loadOverrides = async () => {
+      try {
+        const response = await fetch('/api/menu-items/overrides')
+        if (response.ok) {
+          const data = await response.json()
+          const o = data.overrides as Record<number, MenuItemOverrides>
+          setOverrides(o)
+        }
+      } catch (error) {
+        console.error('Error loading menu item overrides:', error)
+      }
+    }
+
+    loadOverrides()
+  }, [])
 
   return (
     <div className="space-y-8">

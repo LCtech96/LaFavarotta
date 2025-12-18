@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-// GET - Restituisce override di nome e prezzo per i menu items
+// GET - Restituisce override di nome, prezzo e visibilità per i menu items
 export async function GET(request: NextRequest) {
   try {
     if (!prisma) {
@@ -28,13 +28,14 @@ export async function GET(request: NextRequest) {
       {
         name?: string
         price?: number
+        hidden?: boolean
       }
     > = {}
 
     for (const content of contents) {
       const { key, value } = content
 
-      const match = key.match(/^menu_item_(\d+)_(name|price)$/)
+      const match = key.match(/^menu_item_(\d+)_(name|price|hidden)$/)
       if (!match) continue
 
       const [, idStr, field] = match
@@ -52,6 +53,8 @@ export async function GET(request: NextRequest) {
         if (!isNaN(parsed)) {
           overrides[id].price = parsed
         }
+      } else if (field === 'hidden') {
+        overrides[id].hidden = value === 'true'
       }
     }
 

@@ -16,6 +16,7 @@ export default function AdminImages() {
   const [itemImages, setItemImages] = useState<Record<number, string>>({})
   const [itemNameEdits, setItemNameEdits] = useState<Record<number, string>>({})
   const [itemPriceEdits, setItemPriceEdits] = useState<Record<number, string>>({})
+  const [hiddenItems, setHiddenItems] = useState<Record<number, boolean>>({})
   const router = useRouter()
 
   useEffect(() => {
@@ -64,14 +65,14 @@ export default function AdminImages() {
 
       setItemImages(images)
 
-      // Carica override di nome e prezzo
+      // Carica override di nome, prezzo e visibilità
       try {
         const response = await fetch('/api/menu-items/overrides')
         if (response.ok) {
           const data = await response.json()
           const overrides = data.overrides as Record<
             number,
-            { name?: string; price?: number }
+            { name?: string; price?: number; hidden?: boolean }
           >
 
           setItemNameEdits((prev) => {
@@ -92,6 +93,17 @@ export default function AdminImages() {
               if (!Number.isNaN(id) && value.price !== undefined) {
                 // Mostra con virgola per l'admin
                 updated[id] = value.price.toString().replace('.', ',')
+              }
+            })
+            return updated
+          })
+
+          setHiddenItems((prev) => {
+            const updated = { ...prev }
+            Object.entries(overrides).forEach(([idStr, value]) => {
+              const id = Number(idStr)
+              if (!Number.isNaN(id) && value.hidden !== undefined) {
+                updated[id] = value.hidden
               }
             })
             return updated
@@ -258,6 +270,40 @@ export default function AdminImages() {
     } catch (error) {
       console.error('Error saving menu item details:', error)
       alert('Errore nel salvataggio del piatto. Riprova più tardi.')
+    }
+  }
+
+  const handleToggleHidden = async (itemId: number) => {
+    const currentHidden = hiddenItems[itemId] ?? false
+    const newHidden = !currentHidden
+
+    try {
+      const response = await fetch(`/api/menu-items/${itemId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ hidden: newHidden }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null)
+        throw new Error(error?.error || 'Errore nell\'aggiornamento del piatto')
+      }
+
+      setHiddenItems((prev) => ({
+        ...prev,
+        [itemId]: newHidden,
+      }))
+
+      alert(
+        newHidden
+          ? 'Piatto nascosto dal menù.'
+          : 'Piatto nuovamente visibile nel menù.'
+      )
+    } catch (error) {
+      console.error('Error toggling menu item visibility:', error)
+      alert('Errore nel cambiare la visibilità del piatto. Riprova più tardi.')
     }
   }
 
@@ -430,6 +476,26 @@ export default function AdminImages() {
                       className="px-3 py-2 text-sm rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
                     >
                       Salva
+                    </button>
+                  </div>
+                  <div className="flex items-center justify-between text-xs mt-1">
+                    <span
+                      className={`font-medium ${
+                        hiddenItems[item.id]
+                          ? 'text-red-500'
+                          : 'text-green-500'
+                      }`}
+                    >
+                      {hiddenItems[item.id]
+                        ? 'Piatto nascosto dal menù'
+                        : 'Piatto visibile nel menù'}
+                    </span>
+                    <button
+                      type="button"
+                      onClick={() => handleToggleHidden(item.id)}
+                      className="px-2 py-1 rounded-md border border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                    >
+                      {hiddenItems[item.id] ? 'Mostra piatto' : 'Nascondi piatto'}
                     </button>
                   </div>
                 </div>

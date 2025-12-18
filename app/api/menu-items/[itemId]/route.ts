@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-// PATCH - Aggiorna nome e prezzo di un menu item (tramite Content come override)
+// PATCH - Aggiorna nome, prezzo e visibilità di un menu item (tramite Content come override)
 export async function PATCH(
   request: NextRequest,
   { params }: { params: { itemId: string } }
@@ -24,7 +24,11 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { name, price } = body as { name?: string; price?: number }
+    const { name, price, hidden } = body as {
+      name?: string
+      price?: number
+      hidden?: boolean
+    }
 
     if (name !== undefined && typeof name !== 'string') {
       return NextResponse.json(
@@ -36,6 +40,13 @@ export async function PATCH(
     if (price !== undefined && typeof price !== 'number') {
       return NextResponse.json(
         { error: 'Prezzo non valido' },
+        { status: 400 }
+      )
+    }
+
+    if (hidden !== undefined && typeof hidden !== 'boolean') {
+      return NextResponse.json(
+        { error: 'Valore hidden non valido' },
         { status: 400 }
       )
     }
@@ -72,6 +83,24 @@ export async function PATCH(
           create: {
             key,
             value: price.toString(),
+            type: 'text',
+          },
+        })
+      )
+    }
+
+    if (hidden !== undefined) {
+      const key = `menu_item_${itemId}_hidden`
+      operations.push(
+        prisma.content.upsert({
+          where: { key },
+          update: {
+            value: hidden ? 'true' : 'false',
+            type: 'text',
+          },
+          create: {
+            key,
+            value: hidden ? 'true' : 'false',
             type: 'text',
           },
         })
