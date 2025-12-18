@@ -100,13 +100,22 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
   }
 
   const handleCrop = async () => {
-    if (!croppedAreaPixels) return
+    if (!croppedAreaPixels) {
+      console.warn('Nessuna area di ritaglio selezionata')
+      alert('Seleziona un\'area da ritagliare prima di confermare')
+      return
+    }
 
     try {
       const croppedImage = await getCroppedImg(image, croppedAreaPixels, rotation)
-      onCropComplete(croppedImage)
+      if (croppedImage) {
+        onCropComplete(croppedImage)
+      } else {
+        throw new Error('Errore nella generazione dell\'immagine ritagliata')
+      }
     } catch (e) {
       console.error('Error cropping image:', e)
+      alert('Errore durante il ritaglio dell\'immagine. Riprova.')
     }
   }
 
@@ -190,7 +199,8 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
             </button>
             <button
               onClick={handleCrop}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2"
+              disabled={!croppedAreaPixels}
+              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Check size={20} />
               Conferma Ritaglio
@@ -201,6 +211,7 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
     </div>
   )
 }
+
 
 
 

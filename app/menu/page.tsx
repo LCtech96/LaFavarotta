@@ -1,8 +1,36 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { MenuList } from '@/components/menu-list'
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lafavarotta.site'
+
+export const metadata: Metadata = {
+  title: "Menu - La Favarotta Ristorante Pizzeria Terrasini",
+  description: "Scopri il menu completo del Ristorante La Favarotta a Terrasini. Pizza artigianale, specialità di pesce siciliano, antipasti, primi piatti, secondi e dolci. Piatti tradizionali siciliani preparati con ingredienti freschi e di qualità.",
+  keywords: [
+    "menu La Favarotta",
+    "menu ristorante Terrasini",
+    "pizza Terrasini",
+    "menu pesce Terrasini",
+    "piatti siciliani",
+    "menu ristorante Palermo",
+    "pizza artigianale",
+    "specialità siciliane",
+    "menu completo Terrasini"
+  ],
+  openGraph: {
+    title: "Menu - La Favarotta Ristorante Pizzeria Terrasini",
+    description: "Scopri il menu completo del Ristorante La Favarotta. Pizza artigianale, specialità di pesce siciliano e piatti tradizionali.",
+    url: `${siteUrl}/menu`,
+    images: [`${siteUrl}/cover-image.png`],
+  },
+  alternates: {
+    canonical: `${siteUrl}/menu`,
+  },
+}
 
 export default function MenuPage() {
   return (

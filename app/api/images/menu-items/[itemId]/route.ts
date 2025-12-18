@@ -134,3 +134,54 @@ export async function POST(
   }
 }
 
+// DELETE - Rimuove l'immagine di un menu item
+export async function DELETE(
+  request: NextRequest,
+  { params }: { params: { itemId: string } }
+) {
+  try {
+    const itemId = parseInt(params.itemId)
+
+    if (isNaN(itemId)) {
+      return NextResponse.json(
+        { error: 'ID menu item non valido' },
+        { status: 400 }
+      )
+    }
+
+    if (!prisma) {
+      return NextResponse.json(
+        { error: 'Database non disponibile' },
+        { status: 500 }
+      )
+    }
+
+    const key = `menu_item_image_${itemId}`
+
+    // Prova a rimuovere dal MenuItem se esiste
+    const existingItem = await prisma.menuItem.findUnique({
+      where: { id: itemId }
+    })
+
+    if (existingItem) {
+      await prisma.menuItem.update({
+        where: { id: itemId },
+        data: { imageUrl: null }
+      })
+    }
+
+    // Rimuovi eventuale fallback nella tabella Content
+    await prisma.content.deleteMany({
+      where: { key }
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error('Error deleting menu item image:', error)
+    return NextResponse.json(
+      { error: 'Errore nella rimozione dell\'immagine' },
+      { status: 500 }
+    )
+  }
+}
+

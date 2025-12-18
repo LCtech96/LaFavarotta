@@ -1,24 +1,29 @@
 // Prisma Client - will be generated during build
-// This file is optional and only needed if you want to use the database
-// Currently, menu data is static in data/menu-data.ts
-
-let PrismaClient: any
-try {
-  PrismaClient = require('@prisma/client').PrismaClient
-} catch (e) {
-  // Prisma Client not generated yet - this is OK for static data
-  PrismaClient = null
-}
+import { PrismaClient } from '@prisma/client'
 
 const globalForPrisma = globalThis as unknown as {
-  prisma: any | undefined
+  prisma: PrismaClient | undefined
 }
 
-export const prisma = PrismaClient
-  ? globalForPrisma.prisma ?? new PrismaClient()
-  : null
+let prismaInstance: PrismaClient | null = null
 
-if (process.env.NODE_ENV !== 'production' && prisma) {
-  globalForPrisma.prisma = prisma
+try {
+  prismaInstance =
+    globalForPrisma.prisma ??
+    new PrismaClient({
+      log: process.env.NODE_ENV === 'development' ? ['query', 'error', 'warn'] : ['error'],
+    })
+
+  if (process.env.NODE_ENV !== 'production') {
+    globalForPrisma.prisma = prismaInstance
+  } else {
+    // In produzione, mantieni la connessione globale
+    globalForPrisma.prisma = prismaInstance
+  }
+} catch (error) {
+  console.error('Error initializing Prisma Client:', error)
+  prismaInstance = null
 }
+
+export const prisma = prismaInstance
 

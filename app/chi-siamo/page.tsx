@@ -1,8 +1,34 @@
+import { Metadata } from 'next'
 import Link from 'next/link'
 import { ArrowLeft } from 'lucide-react'
 import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { StaffSection } from '@/components/staff-section'
+
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lafavarotta.site'
+
+export const metadata: Metadata = {
+  title: "Chi Siamo - La Favarotta Ristorante Pizzeria Terrasini",
+  description: "Conosci la storia del Ristorante La Favarotta a Terrasini. Scopri il titolare Leone Vincenzo, i nostri chef specializzati in cucina di pesce e pizza siciliana, e il nostro team appassionato di cucina siciliana tradizionale.",
+  keywords: [
+    "La Favarotta storia",
+    "ristorante Terrasini storia",
+    "Leone Vincenzo",
+    "chef Terrasini",
+    "cucina siciliana tradizionale",
+    "ristorante famiglia Terrasini",
+    "staff La Favarotta"
+  ],
+  openGraph: {
+    title: "Chi Siamo - La Favarotta Ristorante Pizzeria Terrasini",
+    description: "Conosci la storia del Ristorante La Favarotta, il titolare Leone Vincenzo e il nostro team appassionato di cucina siciliana.",
+    url: `${siteUrl}/chi-siamo`,
+    images: [`${siteUrl}/cover-image.png`],
+  },
+  alternates: {
+    canonical: `${siteUrl}/chi-siamo`,
+  },
+}
 
 export default function ChiSiamoPage() {
   return (

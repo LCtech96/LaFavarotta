@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { LogOut, Image as ImageIcon, FileText, PlusSquare } from 'lucide-react'
+import { LogOut, Image as ImageIcon, FileText, PlusSquare, Calendar } from 'lucide-react'
 import Link from 'next/link'
 
 export default function AdminPanel() {
@@ -43,7 +43,7 @@ export default function AdminPanel() {
           </button>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <Link
             href="/admin/images"
             className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
@@ -93,6 +93,19 @@ export default function AdminPanel() {
             </h2>
             <p className="text-gray-600 dark:text-gray-400">
               Crea e gestisci i post del piatto del giorno per il feed
+            </p>
+          </Link>
+
+          <Link
+            href="/admin/holidays"
+            className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+          >
+            <Calendar size={48} className="text-red-600 dark:text-red-400 mb-4" />
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
+              Menu Festività
+            </h2>
+            <p className="text-gray-600 dark:text-gray-400">
+              Gestisci menu speciali per Natale, Pasqua, Capodanno e altre festività
             </p>
           </Link>
         </div>

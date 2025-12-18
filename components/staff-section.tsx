@@ -6,6 +6,7 @@ import { base64ToBlobUrl, isAndroid } from '@/lib/utils'
 
 export function StaffSection() {
   const [ownerImage, setOwnerImage] = useState<string | null>(null)
+  const [isLoading, setIsLoading] = useState<boolean>(true)
   const [ownerName, setOwnerName] = useState<string>('Leone Vincenzo')
   const [ownerDescription, setOwnerDescription] = useState<string>(
     'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato La Favarotta in un punto di riferimento per la gastronomia siciliana. La sua dedizione alla qualità e all\'autenticità si riflette in ogni piatto che esce dalla nostra cucina.'
@@ -13,29 +14,41 @@ export function StaffSection() {
 
   useEffect(() => {
     const loadOwnerPhoto = async () => {
+      setIsLoading(true)
       try {
-        // Prima prova a caricare dal database
-        const response = await fetch('/api/staff/owner')
+        // Carica sempre dal database per avere l'immagine più aggiornata
+        const response = await fetch('/api/staff/owner', {
+          cache: 'no-store',
+          headers: {
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache',
+            'Expires': '0'
+          }
+        })
+        
         if (response.ok) {
           const data = await response.json()
           if (data.imageUrl) {
             const imageUrl = data.imageUrl
-            localStorage.setItem('owner_image', imageUrl)
             
             // Per Android, converti in blob URL
+            let finalImageUrl = imageUrl
             if (isAndroid() && imageUrl.startsWith('data:image')) {
               const blobUrl = base64ToBlobUrl(imageUrl)
               if (blobUrl) {
-                setOwnerImage(blobUrl)
-              } else {
-                setOwnerImage(imageUrl)
+                finalImageUrl = blobUrl
               }
-            } else {
-              setOwnerImage(imageUrl)
             }
+            
+            // Aggiorna l'immagine solo dopo averla caricata dal database
+            setOwnerImage(finalImageUrl)
+            
+            // Aggiorna localStorage solo dopo aver confermato l'immagine dal database
+            localStorage.setItem('owner_image', imageUrl)
             
             if (data.name) setOwnerName(data.name)
             if (data.description) setOwnerDescription(data.description)
+            setIsLoading(false)
             return
           }
         }
@@ -43,7 +56,8 @@ export function StaffSection() {
         console.error('Error loading owner photo:', error)
       }
 
-      // Fallback a localStorage
+      // Fallback a localStorage solo se il database non ha un'immagine
+      // e solo dopo aver tentato di caricare dal database
       const savedImage = localStorage.getItem('owner_image')
       if (savedImage) {
         if (isAndroid() && savedImage.startsWith('data:image')) {
@@ -57,6 +71,7 @@ export function StaffSection() {
           setOwnerImage(savedImage)
         }
       }
+      setIsLoading(false)
     }
 
     loadOwnerPhoto()
@@ -103,13 +118,13 @@ export function StaffSection() {
         </h2>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0 mx-auto md:mx-0 overflow-hidden relative">
-            {ownerImage ? (
+            {!isLoading && ownerImage ? (
               ownerImage.startsWith('data:') || ownerImage.startsWith('blob:') ? (
                 <img
                   src={ownerImage}
                   alt={ownerName}
                   className="w-full h-full object-cover"
-                  loading="lazy"
+                  loading="eager"
                   decoding="async"
                   crossOrigin="anonymous"
                   onError={(e) => {
@@ -129,6 +144,7 @@ export function StaffSection() {
                   alt={ownerName}
                   fill
                   className="object-cover"
+                  priority
                 />
               )
             ) : null}
@@ -151,7 +167,6 @@ export function StaffSection() {
         </h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
               Chef del Pesce
             </h3>
@@ -161,7 +176,6 @@ export function StaffSection() {
             </p>
           </div>
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <div className="w-24 h-24 bg-gray-200 dark:bg-gray-700 rounded-full mx-auto mb-4"></div>
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
               Pizzaiolo
             </h3>

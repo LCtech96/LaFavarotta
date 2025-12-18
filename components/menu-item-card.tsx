@@ -6,7 +6,7 @@ import { type MenuItem } from '@/data/menu-data'
 import { formatPrice, base64ToBlobUrl, isAndroid } from '@/lib/utils'
 import { useCartStore } from '@/store/cart-store'
 import { MenuItemModal } from './menu-item-modal'
-import { Star, Leaf, AlertCircle } from 'lucide-react'
+import { Fish, Pizza } from 'lucide-react'
 
 interface MenuItemCardProps {
   item: MenuItem
@@ -16,6 +16,13 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const [itemImage, setItemImage] = useState<string | null>(null)
   const blobUrlRef = useRef<string | null>(null)
+
+  const isPizza = item.categoryId === 4
+  const isFishDish =
+    item.allergens?.some((a) => {
+      const lower = a.toLowerCase()
+      return lower.includes('pesce') || lower.includes('molluschi')
+    }) ?? false
 
   useEffect(() => {
     // Load image from database with localStorage fallback
@@ -88,6 +95,16 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
       const customEvent = e as CustomEvent
       if (customEvent.detail?.itemId === item.id) {
         const imageUrl = customEvent.detail.imageUrl
+        // Se l'immagine è stata rimossa, pulisci stato e cache
+        if (!imageUrl) {
+          if (blobUrlRef.current) {
+            URL.revokeObjectURL(blobUrlRef.current)
+            blobUrlRef.current = null
+          }
+          localStorage.removeItem(`item_image_${item.id}`)
+          setItemImage(null)
+          return
+        }
         // Per Android, converti in blob URL
         if (isAndroid() && imageUrl.startsWith('data:image')) {
           const blobUrl = base64ToBlobUrl(imageUrl)
@@ -170,17 +187,12 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex-1">
               {item.name}
             </h3>
-            <div className="flex gap-1 ml-2">
-              {item.isBestSeller && (
-                <Star size={16} className="text-yellow-500 fill-yellow-500" />
-              )}
-              {item.isVegan && (
-                <Leaf size={16} className="text-green-500" />
-              )}
-              {item.isGlutenFree && (
-                <AlertCircle size={16} className="text-blue-500" />
-              )}
-            </div>
+            {(isFishDish || isPizza) && (
+              <div className="flex items-center ml-2 text-blue-400">
+                {isFishDish && <Fish size={18} />}
+                {!isFishDish && isPizza && <Pizza size={18} />}
+              </div>
+            )}
           </div>
           {item.description && (
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">

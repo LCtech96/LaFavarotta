@@ -12,14 +12,10 @@ interface OrderModalProps {
 
 export function OrderModal({ isOpen, onClose }: OrderModalProps) {
   const { items, getTotal, clearCart } = useCartStore()
-  const [orderType, setOrderType] = useState<'table' | 'takeaway'>('table')
   const [formData, setFormData] = useState({
-    tableNumber: '',
     name: '',
     surname: '',
-    deliveryTime: '',
-    address: '',
-    houseNumber: '',
+    pickupTime: '',
     phone: '',
   })
 
@@ -28,7 +24,7 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+393276976442'
 
   const handleSubmit = () => {
-    let message = `*Nuovo Ordine - ${orderType === 'table' ? 'Al Tavolo' : 'Da Asporto'}*\n\n`
+    let message = `*Nuovo Ordine - Da Asporto*\n\n`
     
     items.forEach((item) => {
       message += `*${item.name}* x${item.quantity}\n`
@@ -43,19 +39,13 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
 
     message += `*Totale: ${formatPrice(getTotal())}*\n\n`
 
-    if (orderType === 'table') {
-      message += `*Dati Cliente:*\n`
-      message += `Nome: ${formData.name} ${formData.surname}\n`
-      message += `Tavolo: ${formData.tableNumber}\n`
-    } else {
-      message += `*Dati Consegna:*\n`
-      message += `Nome: ${formData.name} ${formData.surname}\n`
-      message += `Indirizzo: ${formData.address}, ${formData.houseNumber}\n`
-      message += `Telefono: ${formData.phone}\n`
-      if (formData.deliveryTime) {
-        message += `Orario preferito: ${formData.deliveryTime}\n`
-      }
+    message += `*Dati Ritiro:*\n`
+    message += `Nome: ${formData.name} ${formData.surname}\n`
+    message += `Telefono: ${formData.phone}\n`
+    if (formData.pickupTime) {
+      message += `Orario di ritiro: ${formData.pickupTime}\n`
     }
+    message += `\n*Nota: Il ritiro deve essere effettuato presso il ristorante. Non effettuiamo consegne a domicilio.*\n`
 
     const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
@@ -79,154 +69,72 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
         </div>
 
         <div className="p-6 space-y-6">
-          {/* Order Type Selection */}
-          <div>
-            <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">
-              Tipo di ordine
-            </h3>
-            <div className="flex gap-4">
-              <button
-                onClick={() => setOrderType('table')}
-                className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
-                  orderType === 'table'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Al Tavolo
-              </button>
-              <button
-                onClick={() => setOrderType('takeaway')}
-                className={`flex-1 py-3 rounded-lg font-semibold transition-colors ${
-                  orderType === 'takeaway'
-                    ? 'bg-blue-600 text-white'
-                    : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300'
-                }`}
-              >
-                Da Asporto
-              </button>
+          {/* Takeaway Form */}
+          <div className="space-y-4">
+            {/* Informazione importante */}
+            <div className="bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg p-4">
+              <p className="text-sm text-yellow-800 dark:text-yellow-200 font-medium mb-1">
+                ⚠️ Importante
+              </p>
+              <p className="text-sm text-yellow-700 dark:text-yellow-300">
+                Il ristorante La Favarotta <strong>non effettua consegne a domicilio</strong>. 
+                È necessario ritirare l&apos;ordine presso il ristorante.
+              </p>
+            </div>
+
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Nome *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.name}
+                onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Cognome *
+              </label>
+              <input
+                type="text"
+                required
+                value={formData.surname}
+                onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Telefono *
+              </label>
+              <input
+                type="tel"
+                required
+                value={formData.phone}
+                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                placeholder="Es: 3331234567"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                Orario di ritiro *
+              </label>
+              <input
+                type="time"
+                required
+                value={formData.pickupTime}
+                onChange={(e) => setFormData({ ...formData, pickupTime: e.target.value })}
+                className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+              />
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                Seleziona l&apos;orario in cui desideri ritirare l&apos;ordine al ristorante
+              </p>
             </div>
           </div>
-
-          {/* Table Form */}
-          {orderType === 'table' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Numero Tavolo *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.tableNumber}
-                  onChange={(e) => setFormData({ ...formData, tableNumber: e.target.value })}
-                  placeholder="Es: 5"
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Nome *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Cognome *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.surname}
-                  onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-          )}
-
-          {/* Takeaway Form */}
-          {orderType === 'takeaway' && (
-            <div className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Nome *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.name}
-                  onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Cognome *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.surname}
-                  onChange={(e) => setFormData({ ...formData, surname: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Telefono *
-                </label>
-                <input
-                  type="tel"
-                  required
-                  value={formData.phone}
-                  onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Indirizzo *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.address}
-                  onChange={(e) => setFormData({ ...formData, address: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Numero civico *
-                </label>
-                <input
-                  type="text"
-                  required
-                  value={formData.houseNumber}
-                  onChange={(e) => setFormData({ ...formData, houseNumber: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Orario preferito di consegna
-                </label>
-                <input
-                  type="time"
-                  value={formData.deliveryTime}
-                  onChange={(e) => setFormData({ ...formData, deliveryTime: e.target.value })}
-                  className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                />
-              </div>
-            </div>
-          )}
 
           {/* Order Summary */}
           <div className="border-t border-gray-200 dark:border-gray-700 pt-4">
@@ -258,10 +166,7 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
           {/* Submit Button */}
           <button
             onClick={handleSubmit}
-            disabled={
-              (orderType === 'table' && (!formData.tableNumber || !formData.name || !formData.surname)) ||
-              (orderType === 'takeaway' && (!formData.name || !formData.surname || !formData.phone || !formData.address || !formData.houseNumber))
-            }
+            disabled={!formData.name || !formData.surname || !formData.phone || !formData.pickupTime}
             className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
             Invia ordine via WhatsApp

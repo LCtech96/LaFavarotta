@@ -1,6 +1,5 @@
 'use client'
 
-import { EditableText } from './editable-text'
 import { useState, useEffect } from 'react'
 
 export function RestaurantDescription() {
@@ -42,36 +41,15 @@ export function RestaurantDescription() {
   return (
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="max-w-3xl mx-auto">
-        <EditableText
-          value={desc1}
-          onSave={(v) => {
-            setDesc1(v)
-            handleSave('desc1', v)
-          }}
-          tag="p"
-          multiline
-          className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed text-center"
-        />
-        <EditableText
-          value={desc2}
-          onSave={(v) => {
-            setDesc2(v)
-            handleSave('desc2', v)
-          }}
-          tag="p"
-          multiline
-          className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed text-center mt-4"
-        />
-        <EditableText
-          value={desc3}
-          onSave={(v) => {
-            setDesc3(v)
-            handleSave('desc3', v)
-          }}
-          tag="p"
-          multiline
-          className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed text-center mt-4"
-        />
+        <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed text-center">
+          {desc1}
+        </p>
+        <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed text-center mt-4">
+          {desc2}
+        </p>
+        <p className="text-base md:text-lg text-gray-700 dark:text-gray-300 leading-relaxed text-center mt-4">
+          {desc3}
+        </p>
       </div>
     </div>
   )

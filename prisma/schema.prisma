@@ -91,3 +91,55 @@ model Post {
   updatedAt   DateTime @updatedAt
 }
 
+model HolidayMenu {
+  id          Int                    @id @default(autoincrement())
+  name        String                 @unique // 'Natale', 'Capodanno', 'Epifania', 'Pasqua', 'Altre festività', etc.
+  displayName String                 // Nome visualizzato
+  previewImage String?               // Immagine di anteprima per l'highlight
+  menuText    String?                // Testo unico del menu (opzionale, alternativa ai piatti) - DEPRECATO: usa HolidayMenuVariant
+  menuPrice   Float?                 // Prezzo del menu completo (opzionale) - DEPRECATO: usa HolidayMenuVariant
+  menuImages  String[]               // Array di immagini per il menu testuale - DEPRECATO: usa HolidayMenuVariant
+  items       HolidayMenuItem[]
+  variants    HolidayMenuVariant[]  // Menu multipli per questa festività
+  createdAt   DateTime               @default(now())
+  updatedAt   DateTime               @updatedAt
+}
+
+model HolidayMenuVariant {
+  id          Int               @id @default(autoincrement())
+  holidayMenuId Int
+  holidayMenu HolidayMenu      @relation(fields: [holidayMenuId], references: [id], onDelete: Cascade)
+  title       String            // Titolo del menu (es. "Menu Completo", "Menu Vegetariano")
+  menuText    String?           // Testo del menu
+  menuPrice   Float?            // Prezzo del menu
+  menuImages  String[]          // Array di immagini per il menu
+  order       Int               @default(0) // Ordine di visualizzazione
+  items       HolidayMenuItemVariant[]
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+}
+
+model HolidayMenuItemVariant {
+  id          Int                 @id @default(autoincrement())
+  variantId   Int
+  variant     HolidayMenuVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  name        String              // Titolo del piatto
+  ingredients String[]            // Array di ingredienti
+  price       Float
+  imageUrl    String?
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+}
+
+model HolidayMenuItem {
+  id          Int         @id @default(autoincrement())
+  holidayMenuId Int
+  holidayMenu HolidayMenu @relation(fields: [holidayMenuId], references: [id], onDelete: Cascade)
+  name        String      // Titolo del piatto
+  ingredients String[]   // Array di ingredienti
+  price       Float
+  imageUrl    String?
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
