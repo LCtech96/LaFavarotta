@@ -603,7 +603,8 @@ export default function AdminImages() {
                 </div>
               </div>
             </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
