@@ -427,74 +427,99 @@ export default function AdminImages() {
 
         {/* Items List */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {filteredItems.map((item) => (
-            <div
-              key={item.id}
-              className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4"
-            >
-              <h3 className="font-semibold text-gray-900 dark:text-white mb-2">
-                {item.name}
-              </h3>
-              <div className="mb-4">
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-                  Immagine piatto
-                </label>
-                <div className="relative">
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={(e) => {
-                      const file = e.target.files?.[0]
-                      if (file) {
-                        handleFileSelect(item.id, file)
-                      }
-                    }}
-                    className="hidden"
-                    id={`image-${item.id}`}
-                  />
-                  <label
-                    htmlFor={`image-${item.id}`}
-                    className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
-                  >
-                    <Upload size={16} />
-                    Carica e ritaglia immagine
-                  </label>
-                  {itemImages[item.id] && (
-                    <div className="mt-2 space-y-2">
-                      <div className="flex items-center justify-between">
-                        <div className="text-sm text-green-600 dark:text-green-400">
-                          ✓ Immagine caricata
-                        </div>
-                        <button
-                          type="button"
-                          onClick={() => handleRemoveImage(item.id)}
-                          className="inline-flex items-center gap-1 px-2 py-1 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 transition-colors"
-                        >
-                          <X size={12} />
-                          Rimuovi immagine
-                        </button>
-                      </div>
-                      <img
-                        src={itemImages[item.id]}
-                        alt={item.name}
-                        className="w-full h-32 object-cover rounded-lg"
-                        loading="lazy"
-                        decoding="async"
-                        crossOrigin="anonymous"
-                        onError={(e) => {
-                          console.error('Error loading preview image for item', item.id)
-                          e.currentTarget.style.display = 'none'
-                        }}
-                        style={{ 
-                          display: 'block',
-                          maxWidth: '100%',
-                          height: 'auto'
-                        }}
-                      />
+          {filteredItems.map((item) => {
+            const hasImage = !!itemImages[item.id]
+            return (
+              <div
+                key={item.id}
+                className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-4 ${
+                  hasImage ? 'ring-2 ring-green-500 ring-opacity-50' : ''
+                }`}
+              >
+                <div className="flex items-center justify-between mb-2">
+                  <h3 className="font-semibold text-gray-900 dark:text-white">
+                    {item.name}
+                  </h3>
+                  {hasImage && (
+                    <div className="flex items-center gap-1 px-2 py-1 bg-green-100 dark:bg-green-900 rounded-full">
+                      <div className="w-2 h-2 bg-green-500 rounded-full"></div>
+                      <span className="text-xs font-medium text-green-700 dark:text-green-300">
+                        Immagine presente
+                      </span>
                     </div>
                   )}
                 </div>
-              </div>
+                <div className="mb-4">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+                    Immagine piatto
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0]
+                        if (file) {
+                          handleFileSelect(item.id, file)
+                        }
+                      }}
+                      className="hidden"
+                      id={`image-${item.id}`}
+                    />
+                    <label
+                      htmlFor={`image-${item.id}`}
+                      className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${
+                        hasImage
+                          ? 'bg-green-600 hover:bg-green-700 text-white'
+                          : 'bg-blue-600 hover:bg-blue-700 text-white'
+                      }`}
+                    >
+                      <Upload size={16} />
+                      {hasImage ? 'Sostituisci immagine' : 'Carica e ritaglia immagine'}
+                    </label>
+                    {hasImage && (
+                      <div className="mt-3 space-y-2">
+                        <div className="flex items-center justify-between bg-green-50 dark:bg-green-900/20 p-2 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <div className="text-sm font-medium text-green-700 dark:text-green-400">
+                              ✓ Immagine caricata con successo
+                            </div>
+                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(item.id)}
+                            className="inline-flex items-center gap-1 px-3 py-1.5 text-xs rounded-md bg-red-600 text-white hover:bg-red-700 active:bg-red-800 transition-colors touch-manipulation"
+                          >
+                            <X size={14} />
+                            Rimuovi
+                          </button>
+                        </div>
+                        <div className="relative rounded-lg overflow-hidden border-2 border-green-500 border-opacity-30">
+                          <img
+                            src={itemImages[item.id]}
+                            alt={item.name}
+                            className="w-full h-40 sm:h-48 object-cover"
+                            loading="lazy"
+                            decoding="async"
+                            crossOrigin="anonymous"
+                            onError={(e) => {
+                              console.error('Error loading preview image for item', item.id)
+                              e.currentTarget.style.display = 'none'
+                            }}
+                            style={{ 
+                              display: 'block',
+                              maxWidth: '100%',
+                              height: 'auto'
+                            }}
+                          />
+                          <div className="absolute top-2 right-2 bg-black bg-opacity-50 text-white text-xs px-2 py-1 rounded">
+                            Anteprima
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                </div>
 
               {/* Nome, prezzo e categoria */}
               <div className="space-y-2">
