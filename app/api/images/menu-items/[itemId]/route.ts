@@ -93,12 +93,38 @@ export async function POST(
       )
     }
 
-    const body = await request.json()
+    let body
+    try {
+      body = await request.json()
+    } catch (parseError) {
+      console.error('Error parsing request body:', parseError)
+      return NextResponse.json(
+        { error: 'Formato richiesta non valido', details: 'Impossibile parsare il JSON' },
+        { status: 400 }
+      )
+    }
+
     const { imageUrl } = body
 
     if (!imageUrl || typeof imageUrl !== 'string') {
       return NextResponse.json(
-        { error: 'URL immagine non valido' },
+        { error: 'URL immagine non valido', details: 'Il campo imageUrl è richiesto e deve essere una stringa' },
+        { status: 400 }
+      )
+    }
+
+    // Verifica che sia un'immagine base64 valida
+    if (!imageUrl.startsWith('data:image/')) {
+      return NextResponse.json(
+        { error: 'Formato immagine non valido', details: 'L\'immagine deve essere in formato base64 (data:image/...)' },
+        { status: 400 }
+      )
+    }
+
+    // Verifica dimensione (max ~5MB in base64, che corrisponde a ~3.75MB binario)
+    if (imageUrl.length > 7 * 1024 * 1024) {
+      return NextResponse.json(
+        { error: 'Immagine troppo grande', details: 'L\'immagine non può superare i 5MB. Prova a ridurre la qualità o le dimensioni.' },
         { status: 400 }
       )
     }

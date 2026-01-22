@@ -160,7 +160,18 @@ export default function AdminImages() {
 
     try {
       // Ottimizza l'immagine base64 per Android
-      const optimized = optimizeBase64Image(croppedImage)
+      let optimized: string
+      try {
+        optimized = optimizeBase64Image(croppedImage)
+      } catch (optimizeError) {
+        console.error('Error optimizing image:', optimizeError)
+        throw new Error('Errore nell\'ottimizzazione dell\'immagine. Assicurati che l\'immagine sia valida.')
+      }
+
+      // Verifica che l'immagine ottimizzata non sia troppo grande (max ~5MB in base64)
+      if (optimized.length > 7 * 1024 * 1024) {
+        throw new Error('Immagine troppo grande. Prova con un\'immagine più piccola o riduci la qualità.')
+      }
 
       // Salva nel database tramite API
       const response = await fetch(`/api/images/menu-items/${croppingItemId}`, {
@@ -172,12 +183,31 @@ export default function AdminImages() {
       })
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || 'Errore nel salvataggio dell\'immagine')
+        let errorMessage = 'Errore nel salvataggio dell\'immagine'
+        try {
+          const errorData = await response.json()
+          errorMessage = errorData.error || errorData.details || errorMessage
+          
+          // Messaggio specifico per database non disponibile
+          if (errorMessage.includes('Database non disponibile') || errorMessage.includes('Database unavailable')) {
+            errorMessage = 'Database non disponibile. Verifica che DATABASE_URL sia configurato correttamente su Vercel.'
+          }
+        } catch (parseError) {
+          // Se non riesce a parsare la risposta, usa il messaggio di default
+          errorMessage = `Errore HTTP ${response.status}: ${response.statusText}`
+        }
+        throw new Error(errorMessage)
       }
 
+      const result = await response.json().catch(() => ({ success: true }))
+
       // Salva anche in localStorage come fallback
-      localStorage.setItem(`item_image_${croppingItemId}`, optimized)
+      try {
+        localStorage.setItem(`item_image_${croppingItemId}`, optimized)
+      } catch (storageError) {
+        console.warn('Error saving to localStorage:', storageError)
+        // Non bloccare il flusso se localStorage fallisce
+      }
       
       // Update local state
       setItemImages(prev => ({
@@ -198,7 +228,8 @@ export default function AdminImages() {
       alert('Immagine caricata con successo! L\'immagine è ora visibile nel menu su tutti i dispositivi.')
     } catch (error) {
       console.error('Error saving image:', error)
-      alert('Errore nel caricamento dell\'immagine. Riprova più tardi.')
+      const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
+      alert(`Errore nel caricamento dell'immagine: ${errorMessage}`)
     }
   }
 
