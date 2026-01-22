@@ -332,7 +332,14 @@ export default function AdminImages() {
       )
     } catch (error) {
       console.error('Error toggling menu item visibility:', error)
-      alert('Errore nel cambiare la visibilità del piatto. Riprova più tardi.')
+      const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
+      
+      // Se l'errore indica che il database non è disponibile, mostra un messaggio più specifico
+      if (errorMessage.includes('Database non disponibile') || errorMessage.includes('Database unavailable')) {
+        alert('Errore: Database non disponibile. Verifica che la variabile DATABASE_URL sia configurata correttamente su Vercel. Consulta VERCEL_DATABASE_SETUP.md per le istruzioni.')
+      } else {
+        alert('Errore nel cambiare la visibilità del piatto. Riprova più tardi.')
+      }
     }
   }
 
