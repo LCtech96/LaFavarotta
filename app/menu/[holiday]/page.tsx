@@ -5,7 +5,7 @@ import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { HolidayMenuList } from '@/components/holiday-menu-list'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lafavarotta.site'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '----------'
 
 interface PageProps {
   params: {
@@ -36,10 +36,10 @@ const holidayNames: Record<string, string> = {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const holidayName = holidayNames[params.holiday] || params.holiday
   return {
-    title: `Menu ${holidayName} - La Favarotta Ristorante Terrasini`,
+    title: `Menu ${holidayName}`,
     description: `Scopri il menu speciale di ${holidayName} del Ristorante La Favarotta a Terrasini. Piatti tradizionali siciliani per celebrare le festività.`,
     openGraph: {
-      title: `Menu ${holidayName} - La Favarotta`,
+      title: `Menu ${holidayName}`,
       description: `Menu speciale di ${holidayName} con piatti tradizionali siciliani`,
       url: `${siteUrl}/menu/${params.holiday}`,
     },

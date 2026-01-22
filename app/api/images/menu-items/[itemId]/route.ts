@@ -4,10 +4,11 @@ import { prisma } from '@/lib/db'
 // GET - Recupera l'immagine di un menu item
 export async function GET(
   request: NextRequest,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> | { itemId: string } }
 ) {
   try {
-    const itemId = parseInt(params.itemId)
+    const resolvedParams = await Promise.resolve(params)
+    const itemId = parseInt(resolvedParams.itemId)
     
     if (isNaN(itemId)) {
       return NextResponse.json(
@@ -17,8 +18,16 @@ export async function GET(
     }
 
     if (!prisma) {
-      console.error('Prisma non inizializzato - restituisco nessuna immagine')
+      console.error('Prisma non inizializzato - DATABASE_URL:', process.env.DATABASE_URL ? 'presente' : 'mancante')
       // In produzione, evita di rompere la pagina se il DB non è disponibile
+      return NextResponse.json({ imageUrl: null })
+    }
+
+    // Test connessione database
+    try {
+      await prisma.$queryRaw`SELECT 1`
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
       return NextResponse.json({ imageUrl: null })
     }
 
@@ -46,8 +55,23 @@ export async function GET(
     })
   } catch (error) {
     console.error('Error fetching menu item image:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    
+    if (error instanceof Error) {
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      if (errorStack) {
+        console.error('Error stack:', errorStack)
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Errore nel recupero dell\'immagine' },
+      { 
+        error: 'Errore nel recupero dell\'immagine',
+        details: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && { stack: errorStack })
+      },
       { status: 500 }
     )
   }
@@ -56,10 +80,11 @@ export async function GET(
 // POST - Salva l'immagine di un menu item
 export async function POST(
   request: NextRequest,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> | { itemId: string } }
 ) {
   try {
-    const itemId = parseInt(params.itemId)
+    const resolvedParams = await Promise.resolve(params)
+    const itemId = parseInt(resolvedParams.itemId)
     
     if (isNaN(itemId)) {
       return NextResponse.json(
@@ -79,8 +104,22 @@ export async function POST(
     }
 
     if (!prisma) {
-      console.error('Prisma non inizializzato - salto il salvataggio su DB, ma ritorno success')
-      return NextResponse.json({ success: true, imageUrl })
+      console.error('Prisma non inizializzato - DATABASE_URL:', process.env.DATABASE_URL ? 'presente' : 'mancante')
+      return NextResponse.json(
+        { error: 'Database non disponibile', details: 'Prisma client non inizializzato' },
+        { status: 500 }
+      )
+    }
+
+    // Test connessione database
+    try {
+      await prisma.$queryRaw`SELECT 1`
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { error: 'Database non disponibile', details: 'Errore di connessione al database' },
+        { status: 500 }
+      )
     }
 
     // Verifica che il menu item esista
@@ -124,8 +163,23 @@ export async function POST(
     })
   } catch (error) {
     console.error('Error saving menu item image:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    
+    if (error instanceof Error) {
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      if (errorStack) {
+        console.error('Error stack:', errorStack)
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Errore nel salvataggio dell\'immagine' },
+      { 
+        error: 'Errore nel salvataggio dell\'immagine',
+        details: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && { stack: errorStack })
+      },
       { status: 500 }
     )
   }
@@ -134,10 +188,11 @@ export async function POST(
 // DELETE - Rimuove l'immagine di un menu item
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> | { itemId: string } }
 ) {
   try {
-    const itemId = parseInt(params.itemId)
+    const resolvedParams = await Promise.resolve(params)
+    const itemId = parseInt(resolvedParams.itemId)
 
     if (isNaN(itemId)) {
       return NextResponse.json(
@@ -147,8 +202,22 @@ export async function DELETE(
     }
 
     if (!prisma) {
-      console.error('Prisma non inizializzato - salto la rimozione su DB, ma ritorno success')
-      return NextResponse.json({ success: true })
+      console.error('Prisma non inizializzato - DATABASE_URL:', process.env.DATABASE_URL ? 'presente' : 'mancante')
+      return NextResponse.json(
+        { error: 'Database non disponibile', details: 'Prisma client non inizializzato' },
+        { status: 500 }
+      )
+    }
+
+    // Test connessione database
+    try {
+      await prisma.$queryRaw`SELECT 1`
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { error: 'Database non disponibile', details: 'Errore di connessione al database' },
+        { status: 500 }
+      )
     }
 
     const key = `menu_item_image_${itemId}`
@@ -173,8 +242,23 @@ export async function DELETE(
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error deleting menu item image:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    
+    if (error instanceof Error) {
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      if (errorStack) {
+        console.error('Error stack:', errorStack)
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Errore nella rimozione dell\'immagine' },
+      { 
+        error: 'Errore nella rimozione dell\'immagine',
+        details: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && { stack: errorStack })
+      },
       { status: 500 }
     )
   }

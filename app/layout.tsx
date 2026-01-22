@@ -7,10 +7,10 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lafavarotta.site';
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "La Favarotta - Ristorante Pizzeria Terrasini | Cucina Siciliana e Pizza",
-    template: "%s | La Favarotta Terrasini"
+    default: "Cucina Siciliana e Pizza",
+    template: "%s"
   },
-  description: "Ristorante Pizzeria La Favarotta a Terrasini (PA). Cucina siciliana tradizionale, pizza artigianale e sala banchetti. Specialità di pesce, piatti tipici siciliani e pizza napoletana. Prenota il tuo tavolo o ordina da asporto. Strada Statale 113, Terrasini.",
+  description: "Ristorante Pizzeria. Cucina siciliana tradizionale, pizza artigianale. Specialità di pesce, piatti tipici siciliani e pizza napoletana. Prenota il tuo tavolo o ordina da asporto.",
   keywords: [
     "ristorante Terrasini",
     "pizzeria Terrasini",
@@ -21,8 +21,8 @@ export const metadata: Metadata = {
     "ristorante pesce Terrasini",
     "cena Terrasini",
     "pranzo Terrasini",
-    "ristorante SS113",
-    "La Favarotta",
+    "ristorante",
+    "----------",
     "ristorante Sicilia",
     "pizza artigianale Terrasini",
     "cucina tradizionale siciliana",
@@ -30,9 +30,9 @@ export const metadata: Metadata = {
     "eventi Terrasini",
     "banchetti Terrasini"
   ],
-  authors: [{ name: "La Favarotta" }],
-  creator: "La Favarotta",
-  publisher: "La Favarotta",
+  authors: [{ name: "Nome" }],
+  creator: "Nome",
+  publisher: "Nome",
   formatDetection: {
     email: false,
     address: false,
@@ -42,9 +42,9 @@ export const metadata: Metadata = {
     type: "website",
     locale: "it_IT",
     url: siteUrl,
-    siteName: "La Favarotta",
-    title: "La Favarotta - Ristorante Pizzeria Terrasini | Cucina Siciliana",
-    description: "Ristorante Pizzeria La Favarotta a Terrasini. Cucina siciliana tradizionale, pizza artigianale e sala banchetti. Specialità di pesce e piatti tipici siciliani.",
+    siteName: "nome",
+    title: "nome via | Cucina Siciliana",
+    description: "Ristorante Pizzeria. Cucina siciliana tradizionale, pizza artigianale e sala banchetti. Specialità di pesce e piatti tipici siciliani.",
     images: [
       {
         url: `${siteUrl}/cover-image.png`,
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "La Favarotta - Ristorante Pizzeria Terrasini",
+    title: "Terrasini",
     description: "Cucina siciliana tradizionale, pizza artigianale e sala banchetti a Terrasini",
     images: [`${siteUrl}/cover-image.png`],
   },

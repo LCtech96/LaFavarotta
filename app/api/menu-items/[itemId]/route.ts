@@ -4,10 +4,11 @@ import { prisma } from '@/lib/db'
 // PATCH - Aggiorna nome, prezzo e visibilità di un menu item (tramite Content come override)
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { itemId: string } }
+  { params }: { params: Promise<{ itemId: string }> | { itemId: string } }
 ) {
   try {
-    const itemId = parseInt(params.itemId)
+    const resolvedParams = await Promise.resolve(params)
+    const itemId = parseInt(resolvedParams.itemId)
 
     if (isNaN(itemId)) {
       return NextResponse.json(
@@ -17,8 +18,20 @@ export async function PATCH(
     }
 
     if (!prisma) {
+      console.error('Prisma non inizializzato - DATABASE_URL:', process.env.DATABASE_URL ? 'presente' : 'mancante')
       return NextResponse.json(
-        { error: 'Database non disponibile' },
+        { error: 'Database non disponibile', details: 'Prisma client non inizializzato' },
+        { status: 500 }
+      )
+    }
+
+    // Test connessione database
+    try {
+      await prisma.$queryRaw`SELECT 1`
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { error: 'Database non disponibile', details: 'Errore di connessione al database' },
         { status: 500 }
       )
     }
@@ -119,8 +132,23 @@ export async function PATCH(
     return NextResponse.json({ success: true })
   } catch (error) {
     console.error('Error updating menu item details:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    
+    if (error instanceof Error) {
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      if (errorStack) {
+        console.error('Error stack:', errorStack)
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Errore nell\'aggiornamento del piatto' },
+      { 
+        error: 'Errore nell\'aggiornamento del piatto',
+        details: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && { stack: errorStack })
+      },
       { status: 500 }
     )
   }

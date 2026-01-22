@@ -30,11 +30,12 @@ export default function AdminImages() {
     setItemNameEdits(initialNames)
     setItemPriceEdits(initialPrices)
 
-    // Load all item images from database + override di nome/prezzo
+    // Load all item images dal database con fallback per-item a localStorage,
+    // così l'admin vede le stesse immagini che vede il cliente
     const loadData = async () => {
       const images: Record<number, string> = {}
 
-      // Carica immagini da database
+      // Carica immagini da database, con fallback locale per ogni piatto
       for (const item of menuItems) {
         try {
           const response = await fetch(`/api/images/menu-items/${item.id}`)
@@ -46,21 +47,27 @@ export default function AdminImages() {
               if (typeof window !== 'undefined') {
                 localStorage.setItem(`item_image_${item.id}`, data.imageUrl)
               }
+              continue
+            }
+          }
+
+          // Se la risposta non è ok o non c'è immagine nel DB, prova localStorage
+          if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(`item_image_${item.id}`)
+            if (saved) {
+              images[item.id] = saved
             }
           }
         } catch (error) {
           console.error(`Error loading image for item ${item.id}:`, error)
-        }
-      }
-
-      // Fallback a localStorage se il database non ha immagini
-      if (typeof window !== 'undefined' && Object.keys(images).length === 0) {
-        menuItems.forEach((item) => {
-          const saved = localStorage.getItem(`item_image_${item.id}`)
-          if (saved) {
-            images[item.id] = saved
+          // In caso di errore di rete/500, prova comunque localStorage
+          if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem(`item_image_${item.id}`)
+            if (saved) {
+              images[item.id] = saved
+            }
           }
-        })
+        }
       }
 
       setItemImages(images)

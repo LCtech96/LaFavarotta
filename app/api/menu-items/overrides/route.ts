@@ -5,8 +5,20 @@ import { prisma } from '@/lib/db'
 export async function GET(request: NextRequest) {
   try {
     if (!prisma) {
+      console.error('Prisma non inizializzato - DATABASE_URL:', process.env.DATABASE_URL ? 'presente' : 'mancante')
       return NextResponse.json(
-        { error: 'Database non disponibile' },
+        { error: 'Database non disponibile', details: 'Prisma client non inizializzato' },
+        { status: 500 }
+      )
+    }
+
+    // Test connessione database
+    try {
+      await prisma.$queryRaw`SELECT 1`
+    } catch (dbError) {
+      console.error('Database connection error:', dbError)
+      return NextResponse.json(
+        { error: 'Database non disponibile', details: 'Errore di connessione al database' },
         { status: 500 }
       )
     }
@@ -61,8 +73,23 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ overrides })
   } catch (error) {
     console.error('Error fetching menu item overrides:', error)
+    const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
+    const errorStack = error instanceof Error ? error.stack : undefined
+    
+    if (error instanceof Error) {
+      console.error('Error name:', error.name)
+      console.error('Error message:', error.message)
+      if (errorStack) {
+        console.error('Error stack:', errorStack)
+      }
+    }
+    
     return NextResponse.json(
-      { error: 'Errore nel recupero dei piatti' },
+      { 
+        error: 'Errore nel recupero dei piatti',
+        details: errorMessage,
+        ...(process.env.NODE_ENV === 'development' && { stack: errorStack })
+      },
       { status: 500 }
     )
   }
