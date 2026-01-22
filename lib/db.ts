@@ -17,6 +17,8 @@ try {
           url: process.env.DATABASE_URL,
         },
       },
+      // Configurazione per gestire meglio le connessioni con pooler
+      // connection_limit: gestito automaticamente da Prisma
     })
 
   if (process.env.NODE_ENV !== 'production') {
