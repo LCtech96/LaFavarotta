@@ -151,13 +151,34 @@ export async function POST(
       )
     }
 
-    // Test connessione database
-    try {
-      await prisma.$queryRaw`SELECT 1`
-    } catch (dbError) {
-      console.error('Database connection error:', dbError)
+    // Test connessione database con retry logic
+    let dbConnected = false
+    let lastError: Error | null = null
+    const maxRetries = 3
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await prisma.$queryRaw`SELECT 1`
+        dbConnected = true
+        break
+      } catch (dbError) {
+        lastError = dbError instanceof Error ? dbError : new Error(String(dbError))
+        console.error(`Database connection attempt ${attempt}/${maxRetries} failed:`, lastError)
+        
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 500 * attempt))
+        }
+      }
+    }
+    
+    if (!dbConnected) {
+      console.error('Database connection failed after retries:', lastError)
       return NextResponse.json(
-        { error: 'Database non disponibile', details: 'Errore di connessione al database' },
+        { 
+          error: 'Database non disponibile', 
+          details: lastError?.message || 'Errore di connessione al database dopo tentativi multipli',
+          retried: maxRetries
+        },
         { status: 500 }
       )
     }
