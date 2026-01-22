@@ -17,6 +17,7 @@ export default function AdminImages() {
   const [itemNameEdits, setItemNameEdits] = useState<Record<number, string>>({})
   const [itemPriceEdits, setItemPriceEdits] = useState<Record<number, string>>({})
   const [hiddenItems, setHiddenItems] = useState<Record<number, boolean>>({})
+  const [categoryOverrides, setCategoryOverrides] = useState<Record<number, number>>({})
   const router = useRouter()
 
   useEffect(() => {
@@ -72,14 +73,14 @@ export default function AdminImages() {
 
       setItemImages(images)
 
-      // Carica override di nome, prezzo e visibilità
+      // Carica override di nome, prezzo, visibilità e categoria
       try {
         const response = await fetch('/api/menu-items/overrides')
         if (response.ok) {
           const data = await response.json()
           const overrides = data.overrides as Record<
             number,
-            { name?: string; price?: number; hidden?: boolean }
+            { name?: string; price?: number; hidden?: boolean; categoryId?: number }
           >
 
           setItemNameEdits((prev) => {
@@ -111,6 +112,17 @@ export default function AdminImages() {
               const id = Number(idStr)
               if (!Number.isNaN(id) && value.hidden !== undefined) {
                 updated[id] = value.hidden
+              }
+            })
+            return updated
+          })
+
+          setCategoryOverrides((prev) => {
+            const updated = { ...prev }
+            Object.entries(overrides).forEach(([idStr, value]) => {
+              const id = Number(idStr)
+              if (!Number.isNaN(id) && value.categoryId !== undefined) {
+                updated[id] = value.categoryId
               }
             })
             return updated
@@ -295,6 +307,12 @@ export default function AdminImages() {
         throw new Error(error?.error || 'Errore nell\'aggiornamento della categoria')
       }
 
+      // Aggiorna lo stato locale per riflettere immediatamente il cambiamento
+      setCategoryOverrides((prev) => ({
+        ...prev,
+        [itemId]: categoryId,
+      }))
+
       alert('Categoria aggiornata con successo.')
     } catch (error) {
       console.error('Error saving category:', error)
@@ -347,9 +365,18 @@ export default function AdminImages() {
     return null
   }
 
+  // Applica gli override di categoria ai menu items per il filtro
+  const effectiveMenuItems = menuItems.map((item) => {
+    const overrideCategoryId = categoryOverrides[item.id]
+    return {
+      ...item,
+      categoryId: overrideCategoryId !== undefined ? overrideCategoryId : item.categoryId,
+    }
+  })
+
   const filteredItems = selectedCategory !== null
-    ? menuItems.filter(item => item.categoryId === selectedCategory)
-    : menuItems
+    ? effectiveMenuItems.filter(item => item.categoryId === selectedCategory)
+    : effectiveMenuItems
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900">
@@ -515,7 +542,7 @@ export default function AdminImages() {
                     </button>
                   </div>
                   <select
-                    value={item.categoryId}
+                    value={categoryOverrides[item.id] !== undefined ? categoryOverrides[item.id] : item.categoryId}
                     onChange={(e) => {
                       const newCategoryId = parseInt(e.target.value)
                       handleSaveCategory(item.id, newCategoryId)
