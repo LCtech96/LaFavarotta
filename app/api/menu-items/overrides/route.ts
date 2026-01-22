@@ -41,13 +41,14 @@ export async function GET(request: NextRequest) {
         name?: string
         price?: number
         hidden?: boolean
+        categoryId?: number
       }
     > = {}
 
     for (const content of contents) {
       const { key, value } = content
 
-      const match = key.match(/^menu_item_(\d+)_(name|price|hidden)$/)
+      const match = key.match(/^menu_item_(\d+)_(name|price|hidden|categoryId)$/)
       if (!match) continue
 
       const [, idStr, field] = match
@@ -67,6 +68,11 @@ export async function GET(request: NextRequest) {
         }
       } else if (field === 'hidden') {
         overrides[id].hidden = value === 'true'
+      } else if (field === 'categoryId') {
+        const parsed = parseInt(value)
+        if (!isNaN(parsed)) {
+          overrides[id].categoryId = parsed
+        }
       }
     }
 

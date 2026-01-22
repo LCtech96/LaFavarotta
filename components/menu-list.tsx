@@ -8,6 +8,7 @@ type MenuItemOverrides = {
   name?: string
   price?: number
   hidden?: boolean
+  categoryId?: number
 }
 
 export function MenuList() {
@@ -26,6 +27,7 @@ export function MenuList() {
         ...item,
         name: override.name ?? item.name,
         price: override.price ?? item.price,
+        categoryId: override.categoryId ?? item.categoryId,
       }
     })
     // Rimuovi i piatti marcati come hidden

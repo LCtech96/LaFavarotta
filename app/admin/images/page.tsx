@@ -280,6 +280,28 @@ export default function AdminImages() {
     }
   }
 
+  const handleSaveCategory = async (itemId: number, categoryId: number) => {
+    try {
+      const response = await fetch(`/api/menu-items/${itemId}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ categoryId }),
+      })
+
+      if (!response.ok) {
+        const error = await response.json().catch(() => null)
+        throw new Error(error?.error || 'Errore nell\'aggiornamento della categoria')
+      }
+
+      alert('Categoria aggiornata con successo.')
+    } catch (error) {
+      console.error('Error saving category:', error)
+      alert('Errore nell\'aggiornamento della categoria. Riprova più tardi.')
+    }
+  }
+
   const handleToggleHidden = async (itemId: number) => {
     const currentHidden = hiddenItems[itemId] ?? false
     const newHidden = !currentHidden
@@ -440,10 +462,10 @@ export default function AdminImages() {
                 </div>
               </div>
 
-              {/* Nome e prezzo */}
+              {/* Nome, prezzo e categoria */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Nome e prezzo
+                  Nome, prezzo e categoria
                 </label>
                 <div className="flex flex-col gap-2">
                   <input
@@ -485,6 +507,20 @@ export default function AdminImages() {
                       Salva
                     </button>
                   </div>
+                  <select
+                    value={item.categoryId}
+                    onChange={(e) => {
+                      const newCategoryId = parseInt(e.target.value)
+                      handleSaveCategory(item.id, newCategoryId)
+                    }}
+                    className="w-full rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-900 px-3 py-2 text-sm text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  >
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
+                      </option>
+                    ))}
+                  </select>
                   <div className="flex items-center justify-between text-xs mt-1">
                     <span
                       className={`font-medium ${

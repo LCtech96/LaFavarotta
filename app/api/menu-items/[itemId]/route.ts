@@ -37,10 +37,11 @@ export async function PATCH(
     }
 
     const body = await request.json()
-    const { name, price, hidden } = body as {
+    const { name, price, hidden, categoryId } = body as {
       name?: string
       price?: number
       hidden?: boolean
+      categoryId?: number
     }
 
     if (name !== undefined && typeof name !== 'string') {
@@ -62,6 +63,25 @@ export async function PATCH(
         { error: 'Valore hidden non valido' },
         { status: 400 }
       )
+    }
+
+    if (categoryId !== undefined) {
+      if (typeof categoryId !== 'number' || categoryId < 0) {
+        return NextResponse.json(
+          { error: 'Category ID non valido' },
+          { status: 400 }
+        )
+      }
+      // Verifica che la categoria esista
+      const categoryExists = await prisma.category.findUnique({
+        where: { id: categoryId }
+      })
+      if (!categoryExists) {
+        return NextResponse.json(
+          { error: 'Categoria non trovata' },
+          { status: 404 }
+        )
+      }
     }
 
     const operations: Promise<unknown>[] = []
@@ -114,6 +134,24 @@ export async function PATCH(
           create: {
             key,
             value: hidden ? 'true' : 'false',
+            type: 'text',
+          },
+        })
+      )
+    }
+
+    if (categoryId !== undefined) {
+      const key = `menu_item_${itemId}_categoryId`
+      operations.push(
+        prisma.content.upsert({
+          where: { key },
+          update: {
+            value: categoryId.toString(),
+            type: 'text',
+          },
+          create: {
+            key,
+            value: categoryId.toString(),
             type: 'text',
           },
         })
