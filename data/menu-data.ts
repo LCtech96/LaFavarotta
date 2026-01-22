@@ -18,15 +18,21 @@ export interface Category {
 }
 
 export const categories: Category[] = [
-  { id: 0, name: 'Antipasti', order: 0 },
-  { id: 1, name: 'Primi', order: 1 },
-  { id: 2, name: 'Secondi', order: 2 },
-  { id: 3, name: 'Contorni', order: 3 },
-  { id: 4, name: 'Pizze', order: 4 },
-  { id: 5, name: 'Dolci', order: 5 },
-  { id: 6, name: 'Bevande', order: 6 },
-  { id: 7, name: 'Vini bianchi', order: 7 },
-  { id: 8, name: 'Vini rossi', order: 8 },
+  { id: 0, name: 'Street Food', order: 0 },
+  { id: 1, name: 'Arancine', order: 1 },
+  { id: 2, name: 'Antipasti', order: 2 },
+  { id: 3, name: 'Tavola Calda', order: 3 },
+  { id: 4, name: 'Insalate', order: 4 },
+  { id: 5, name: 'Bruschette', order: 5 },
+  { id: 6, name: 'Primi a Forno', order: 6 },
+  { id: 7, name: 'Secondi', order: 7 },
+  { id: 8, name: 'Pizze', order: 8 },
+  { id: 9, name: 'Schiacciate', order: 9 },
+  { id: 10, name: 'Panini e Hamburger', order: 10 },
+  { id: 11, name: 'Panini Classici Piastrati', order: 11 },
+  { id: 12, name: 'Dessert', order: 12 },
+  { id: 13, name: 'Bibite', order: 13 },
+  { id: 14, name: 'Birre', order: 14 },
 ]
 
 export const menuItems: MenuItem[] = [
