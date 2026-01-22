@@ -120,21 +120,24 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-4">
-      <div className="bg-white dark:bg-gray-800 rounded-lg max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
-        <div className="p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+    <div className="fixed inset-0 z-50 bg-black bg-opacity-75 flex items-center justify-center p-2 sm:p-4 overflow-y-auto">
+      <div className="bg-white dark:bg-gray-800 rounded-lg w-full max-w-4xl max-h-[95vh] sm:max-h-[90vh] overflow-hidden flex flex-col my-auto">
+        {/* Header */}
+        <div className="p-3 sm:p-4 border-b border-gray-200 dark:border-gray-700 flex justify-between items-center flex-shrink-0">
+          <h2 className="text-lg sm:text-xl font-bold text-gray-900 dark:text-white">
             Ritaglia Immagine
           </h2>
           <button
             onClick={onCancel}
-            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"
+            className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors touch-manipulation"
+            aria-label="Chiudi"
           >
-            <X size={24} />
+            <X size={20} className="sm:w-6 sm:h-6" />
           </button>
         </div>
 
-        <div className="relative flex-1 min-h-[400px] bg-gray-900">
+        {/* Cropper Container - Responsive height */}
+        <div className="relative flex-1 bg-gray-900 min-h-[250px] sm:min-h-[400px] max-h-[50vh] sm:max-h-[60vh]">
           <Cropper
             image={image}
             crop={crop}
@@ -147,12 +150,15 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
             onCropComplete={onCropCompleteCallback}
             cropShape="rect"
             showGrid={true}
+            restrictPosition={true}
           />
         </div>
 
-        <div className="p-4 border-t border-gray-200 dark:border-gray-700 space-y-4">
+        {/* Controls - Responsive padding and spacing */}
+        <div className="p-3 sm:p-4 border-t border-gray-200 dark:border-gray-700 space-y-3 sm:space-y-4 flex-shrink-0 overflow-y-auto max-h-[40vh]">
+          {/* Zoom Control */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
               Zoom: {Math.round(zoom * 100)}%
             </label>
             <input
@@ -162,15 +168,20 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
               step={0.1}
               value={zoom}
               onChange={(e) => setZoom(Number(e.target.value))}
-              className="w-full"
+              className="w-full h-2 sm:h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 touch-manipulation"
+              style={{
+                WebkitAppearance: 'none',
+                appearance: 'none',
+              }}
             />
           </div>
 
+          {/* Rotation Control */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+            <label className="block text-xs sm:text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5 sm:mb-2">
               Rotazione: {rotation}°
             </label>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-2 sm:gap-4">
               <input
                 type="range"
                 min={0}
@@ -178,32 +189,39 @@ export function ImageCropper({ image, onCropComplete, onCancel, aspectRatio = 1 
                 step={1}
                 value={rotation}
                 onChange={(e) => setRotation(Number(e.target.value))}
-                className="flex-1"
+                className="flex-1 h-2 sm:h-3 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700 touch-manipulation"
+                style={{
+                  WebkitAppearance: 'none',
+                  appearance: 'none',
+                }}
               />
               <button
                 onClick={() => setRotation((prev) => (prev + 90) % 360)}
-                className="p-2 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors"
+                className="p-2 sm:p-2.5 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600 active:bg-gray-300 dark:active:bg-gray-500 transition-colors touch-manipulation min-w-[44px] min-h-[44px] flex items-center justify-center"
                 title="Ruota di 90°"
+                aria-label="Ruota di 90 gradi"
               >
-                <RotateCw size={20} />
+                <RotateCw size={18} className="sm:w-5 sm:h-5" />
               </button>
             </div>
           </div>
 
-          <div className="flex gap-4">
+          {/* Action Buttons - Touch-friendly size */}
+          <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 pt-2">
             <button
               onClick={onCancel}
-              className="flex-1 px-4 py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+              className="flex-1 px-4 py-3 sm:py-2 bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 active:bg-gray-400 dark:active:bg-gray-500 transition-colors font-medium text-sm sm:text-base touch-manipulation min-h-[44px]"
             >
               Annulla
             </button>
             <button
               onClick={handleCrop}
               disabled={!croppedAreaPixels}
-              className="flex-1 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="flex-1 px-4 py-3 sm:py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed font-medium text-sm sm:text-base touch-manipulation min-h-[44px]"
             >
-              <Check size={20} />
-              Conferma Ritaglio
+              <Check size={18} className="sm:w-5 sm:h-5" />
+              <span className="hidden sm:inline">Conferma Ritaglio</span>
+              <span className="sm:hidden">Conferma</span>
             </button>
           </div>
         </div>
