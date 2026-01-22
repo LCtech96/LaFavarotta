@@ -18,12 +18,15 @@ Per risolvere l'errore "Database non disponibile" su Vercel, devi aggiornare la 
    - Trova la variabile `DATABASE_URL` (se esiste) o creane una nuova
    - Imposta il valore a (usa il **transaction pooler** sulla porta 6543 per migliore gestione delle connessioni):
      ```
-     postgresql://postgres.zuxljntziebigbcmduqv:Manciaestattizitto@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
+     postgresql://postgres.[PROJECT_ID]:[PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:6543/postgres?sslmode=require&pgbouncer=true
      ```
    - **Alternativa (session pooler sulla porta 5432):**
      ```
-     postgresql://postgres.zuxljntziebigbcmduqv:Manciaestattizitto@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require
+     postgresql://postgres.[PROJECT_ID]:[PASSWORD]@aws-1-eu-central-1.pooler.supabase.com:5432/postgres?sslmode=require
      ```
+   - **Sostituisci:**
+     - `[PROJECT_ID]` con il tuo Supabase Project ID (trovalo su https://supabase.com/dashboard/project/[your-project]/settings/database)
+     - `[PASSWORD]` con la password del database Supabase
    - **Raccomandato:** Usa la porta **6543** (transaction pooler) per evitare problemi di "troppe connessioni"
    - Assicurati che sia selezionata per tutti gli ambienti (Production, Preview, Development)
    - Clicca su **Save**
@@ -45,8 +48,7 @@ Dopo il redeploy, verifica che:
 
 - **Raccomandato:** Usa il **transaction pooler** (porta 6543) invece del session pooler per evitare problemi di "troppe connessioni"
 - Il transaction pooler è più efficiente per applicazioni serverless come Vercel
-- La password è: `Manciaestattizitto`
-- Il Project ID è: `zuxljntziebigbcmduqv`
+- **⚠️ SICUREZZA:** Non committare mai le credenziali del database su GitHub. Usa sempre variabili d'ambiente.
 
 ### Risoluzione Problemi "Database non disponibile"
 
