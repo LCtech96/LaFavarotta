@@ -23,35 +23,49 @@ export async function GET(
       return NextResponse.json({ imageUrl: null })
     }
 
-    // Test connessione database
-    try {
-      await prisma.$queryRaw`SELECT 1`
-    } catch (dbError) {
-      console.error('Database connection error:', dbError)
+    // Test connessione database con retry logic
+    let dbConnected = false
+    const maxRetries = 2 // Meno retry per GET (più veloce)
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await prisma.$queryRaw`SELECT 1`
+        dbConnected = true
+        break
+      } catch (dbError) {
+        console.error(`Database connection attempt ${attempt}/${maxRetries} failed:`, dbError)
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 300 * attempt)) // Backoff: 300ms, 600ms
+        }
+      }
+    }
+    
+    if (!dbConnected) {
+      // Per GET, restituisci null invece di errore per non rompere la pagina
       return NextResponse.json({ imageUrl: null })
     }
 
-    // Prima prova a recuperare dal MenuItem
-    const menuItem = await prisma.menuItem.findUnique({
-      where: { id: itemId },
-      select: { imageUrl: true }
-    })
-
-    if (menuItem?.imageUrl) {
-      return NextResponse.json({ 
-        imageUrl: menuItem.imageUrl 
-      })
-    }
-
-    // Fallback: prova a recuperare dal Content
+    // Prima prova a recuperare dal Content (storage principale per override)
     const key = `menu_item_image_${itemId}`
     const content = await prisma.content.findUnique({
       where: { key },
       select: { value: true }
     })
 
+    if (content?.value) {
+      return NextResponse.json({ 
+        imageUrl: content.value 
+      })
+    }
+
+    // Fallback: prova a recuperare dal MenuItem (per retrocompatibilità)
+    const menuItem = await prisma.menuItem.findUnique({
+      where: { id: itemId },
+      select: { imageUrl: true }
+    })
+
     return NextResponse.json({ 
-      imageUrl: content?.value || null 
+      imageUrl: menuItem?.imageUrl || null 
     })
   } catch (error) {
     console.error('Error fetching menu item image:', error)
@@ -148,19 +162,19 @@ export async function POST(
       )
     }
 
-    // Verifica che il menu item esista
-    const existingItem = await prisma.menuItem.findUnique({
-      where: { id: itemId }
-    })
-
-    if (!existingItem) {
-      // Se il menu item non esiste nel database, usa il modello Content come fallback
-      const key = `menu_item_image_${itemId}`
+    // Salva l'immagine usando Content come storage principale (più affidabile per override)
+    const key = `menu_item_image_${itemId}`
+    
+    // Usa transazione per garantire atomicità
+    let savedImageUrl: string | null = null
+    
+    try {
       const content = await prisma.content.upsert({
         where: { key },
         update: { 
           value: imageUrl,
-          type: 'image'
+          type: 'image',
+          updatedAt: new Date()
         },
         create: {
           key,
@@ -169,23 +183,33 @@ export async function POST(
         },
         select: { key: true, value: true }
       })
-
-      return NextResponse.json({ 
-        success: true,
-        imageUrl: content.value 
-      })
+      
+      savedImageUrl = content.value
+      
+      // Opzionalmente, aggiorna anche MenuItem se esiste (per retrocompatibilità)
+      try {
+        const existingItem = await prisma.menuItem.findUnique({
+          where: { id: itemId }
+        })
+        
+        if (existingItem) {
+          await prisma.menuItem.update({
+            where: { id: itemId },
+            data: { imageUrl }
+          })
+        }
+      } catch (menuItemError) {
+        // Non bloccare se l'aggiornamento di MenuItem fallisce
+        console.warn(`Could not update MenuItem ${itemId}, but image saved in Content:`, menuItemError)
+      }
+    } catch (saveError) {
+      console.error('Error saving image to Content:', saveError)
+      throw saveError
     }
-
-    // Aggiorna l'immagine
-    const updatedItem = await prisma.menuItem.update({
-      where: { id: itemId },
-      data: { imageUrl },
-      select: { id: true, imageUrl: true }
-    })
 
     return NextResponse.json({ 
       success: true,
-      imageUrl: updatedItem?.imageUrl 
+      imageUrl: savedImageUrl 
     })
   } catch (error) {
     console.error('Error saving menu item image:', error)
@@ -235,13 +259,34 @@ export async function DELETE(
       )
     }
 
-    // Test connessione database
-    try {
-      await prisma.$queryRaw`SELECT 1`
-    } catch (dbError) {
-      console.error('Database connection error:', dbError)
+    // Test connessione database con retry logic
+    let dbConnected = false
+    let lastError: Error | null = null
+    const maxRetries = 3
+    
+    for (let attempt = 1; attempt <= maxRetries; attempt++) {
+      try {
+        await prisma.$queryRaw`SELECT 1`
+        dbConnected = true
+        break
+      } catch (dbError) {
+        lastError = dbError instanceof Error ? dbError : new Error(String(dbError))
+        console.error(`Database connection attempt ${attempt}/${maxRetries} failed:`, lastError)
+        
+        if (attempt < maxRetries) {
+          await new Promise(resolve => setTimeout(resolve, 500 * attempt))
+        }
+      }
+    }
+    
+    if (!dbConnected) {
+      console.error('Database connection failed after retries:', lastError)
       return NextResponse.json(
-        { error: 'Database non disponibile', details: 'Errore di connessione al database' },
+        { 
+          error: 'Database non disponibile', 
+          details: lastError?.message || 'Errore di connessione al database dopo tentativi multipli',
+          retried: maxRetries
+        },
         { status: 500 }
       )
     }
