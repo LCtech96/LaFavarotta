@@ -18,6 +18,8 @@ export default function AdminImages() {
   const [itemPriceEdits, setItemPriceEdits] = useState<Record<number, string>>({})
   const [hiddenItems, setHiddenItems] = useState<Record<number, boolean>>({})
   const [categoryOverrides, setCategoryOverrides] = useState<Record<number, number>>({})
+  const [uploadQueue, setUploadQueue] = useState<Array<{ itemId: number; imageUrl: string }>>([])
+  const [isUploading, setIsUploading] = useState(false)
   const router = useRouter()
 
   useEffect(() => {
@@ -155,6 +157,101 @@ export default function AdminImages() {
     reader.readAsDataURL(file)
   }
 
+  // Funzione per processare la coda di upload con delay
+  const processUploadQueue = async () => {
+    if (isUploading || uploadQueue.length === 0) return
+    
+    setIsUploading(true)
+    
+    // Se ci sono più di 3 immagini in coda, usa batch upload
+    if (uploadQueue.length >= 3) {
+      try {
+        const response = await fetch('/api/images/menu-items/batch', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({ images: uploadQueue }),
+        })
+
+        if (response.ok) {
+          const result = await response.json()
+          // Aggiorna lo stato locale per tutte le immagini caricate
+          result.images?.forEach((img: { itemId: number; imageUrl: string }) => {
+            setItemImages(prev => ({
+              ...prev,
+              [img.itemId]: img.imageUrl
+            }))
+            localStorage.setItem(`item_image_${img.itemId}`, img.imageUrl)
+          })
+          alert(`Caricate ${result.saved} immagini con successo!`)
+          setUploadQueue([])
+        } else {
+          throw new Error('Errore nel batch upload')
+        }
+      } catch (error) {
+        console.error('Error in batch upload:', error)
+        // Fallback: carica una alla volta con delay
+        for (const img of uploadQueue) {
+          await uploadSingleImage(img.itemId, img.imageUrl)
+          await new Promise(resolve => setTimeout(resolve, 1000)) // 1 secondo di delay tra upload
+        }
+        setUploadQueue([])
+      }
+    } else {
+      // Carica una alla volta con delay
+      for (const img of uploadQueue) {
+        await uploadSingleImage(img.itemId, img.imageUrl)
+        if (uploadQueue.length > 1) {
+          await new Promise(resolve => setTimeout(resolve, 1000)) // 1 secondo di delay
+        }
+      }
+      setUploadQueue([])
+    }
+    
+    setIsUploading(false)
+    window.dispatchEvent(new Event('storage'))
+  }
+
+  // Funzione helper per upload singolo
+  const uploadSingleImage = async (itemId: number, imageUrl: string) => {
+    const response = await fetch(`/api/images/menu-items/${itemId}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ imageUrl }),
+    })
+
+    if (!response.ok) {
+      let errorMessage = 'Errore nel salvataggio dell\'immagine'
+      try {
+        const errorData = await response.json()
+        errorMessage = errorData.error || errorData.details || errorMessage
+      } catch (parseError) {
+        errorMessage = `Errore HTTP ${response.status}: ${response.statusText}`
+      }
+      throw new Error(errorMessage)
+    }
+
+    const result = await response.json().catch(() => ({ success: true }))
+    localStorage.setItem(`item_image_${itemId}`, imageUrl)
+    setItemImages(prev => ({
+      ...prev,
+      [itemId]: imageUrl
+    }))
+    
+    return result
+  }
+
+  // Processa la coda quando cambia
+  useEffect(() => {
+    if (uploadQueue.length > 0 && !isUploading) {
+      processUploadQueue()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [uploadQueue.length, isUploading])
+
   const handleCropComplete = async (croppedImage: string) => {
     if (!croppingItemId) return
 
@@ -173,65 +270,21 @@ export default function AdminImages() {
         throw new Error('Immagine troppo grande. Prova con un\'immagine più piccola o riduci la qualità.')
       }
 
-      // Salva nel database tramite API
-      const response = await fetch(`/api/images/menu-items/${croppingItemId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ imageUrl: optimized }),
-      })
+      // Aggiungi alla coda invece di caricare immediatamente
+      setUploadQueue(prev => [...prev, { itemId: croppingItemId, imageUrl: optimized }])
 
-      if (!response.ok) {
-        let errorMessage = 'Errore nel salvataggio dell\'immagine'
-        try {
-          const errorData = await response.json()
-          errorMessage = errorData.error || errorData.details || errorMessage
-          
-          // Messaggio specifico per database non disponibile
-          if (errorMessage.includes('Database non disponibile') || errorMessage.includes('Database unavailable')) {
-            errorMessage = 'Database non disponibile. Verifica che DATABASE_URL sia configurato correttamente su Vercel.'
-          }
-        } catch (parseError) {
-          // Se non riesce a parsare la risposta, usa il messaggio di default
-          errorMessage = `Errore HTTP ${response.status}: ${response.statusText}`
-        }
-        throw new Error(errorMessage)
-      }
-
-      const result = await response.json().catch(() => ({ success: true }))
-
-      // Salva anche in localStorage come fallback
-      try {
-        localStorage.setItem(`item_image_${croppingItemId}`, optimized)
-      } catch (storageError) {
-        console.warn('Error saving to localStorage:', storageError)
-        // Non bloccare il flusso se localStorage fallisce
-      }
-      
-      // Update local state
-      setItemImages(prev => ({
-        ...prev,
-        [croppingItemId]: optimized
-      }))
-      
-      // Trigger custom event for same-tab updates
-      window.dispatchEvent(new Event('storage'))
-      window.dispatchEvent(new CustomEvent('imageUpdated', { 
-        detail: { itemId: croppingItemId, imageUrl: optimized } 
-      }))
-
-      // Reset
+      // Reset immediato per permettere la selezione della prossima immagine
       setCroppingImage(null)
       setCroppingItemId(null)
       
-      alert('Immagine caricata con successo! L\'immagine è ora visibile nel menu su tutti i dispositivi.')
+      alert('Immagine aggiunta alla coda di caricamento. Verrà caricata automaticamente.')
     } catch (error) {
-      console.error('Error saving image:', error)
+      console.error('Error preparing image:', error)
       const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
-      alert(`Errore nel caricamento dell'immagine: ${errorMessage}`)
+      alert(`Errore nella preparazione dell'immagine: ${errorMessage}`)
     }
   }
+
 
   const handleCancelCrop = () => {
     setCroppingImage(null)

@@ -5,7 +5,7 @@ import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { MenuList } from '@/components/menu-list'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://Mancia e statti zitto da Sasà.site'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mancia-e-statti-zitto-da-sasa.site'
 
 export const metadata: Metadata = {
   title: "Menu - Mancia e statti zitto da Sasà Ristorante Pizzeria Terrasini",

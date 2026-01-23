@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://Mancia e statti zitto da Sasà.site';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mancia-e-statti-zitto-da-sasa.site';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),

@@ -5,7 +5,7 @@ import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { StaffSection } from '@/components/staff-section'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://Mancia e statti zitto da Sasà.site'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mancia-e-statti-zitto-da-sasa.site'
 
 export const metadata: Metadata = {
   title: "Chi Siamo - [nome ristorante]",

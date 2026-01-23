@@ -1,6 +1,6 @@
 import { MetadataRoute } from 'next'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://Mancia e statti zitto da Sasà.site'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mancia-e-statti-zitto-da-sasa.site'
 
 export default function sitemap(): MetadataRoute.Sitemap {
   return [
