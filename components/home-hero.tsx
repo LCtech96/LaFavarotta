@@ -5,8 +5,8 @@ import Image from 'next/image'
 import { base64ToBlobUrl, isAndroid } from '@/lib/utils'
 
 export function HomeHero() {
-  const [restaurantName, setRestaurantName] = useState('La Favarotta')
-  const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
+  const [restaurantName, setRestaurantName] = useState('Mancia e statti zitto da Sasà')
+  const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti Mancia e statti zitto da Sasà di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
   const [coverImage, setCoverImage] = useState('/cover-image.png')
   const [profileImage, setProfileImage] = useState<string | null>(null)
   const [isProfileLoading, setIsProfileLoading] = useState<boolean>(true)
@@ -178,7 +178,7 @@ export function HomeHero() {
         {coverImage.startsWith('data:') ? (
           <img
             src={coverImage}
-            alt="La Favarotta - Copertina"
+            alt="Mancia e statti zitto da Sasà - Copertina"
             className="w-full h-full object-cover"
             loading="eager"
             decoding="async"
@@ -197,7 +197,7 @@ export function HomeHero() {
         ) : (
           <Image
             src={coverImage}
-            alt="La Favarotta - Copertina"
+            alt="Mancia e statti zitto da Sasà - Copertina"
             fill
             className="object-cover"
             priority
@@ -214,7 +214,7 @@ export function HomeHero() {
               profileImage.startsWith('data:') || profileImage.startsWith('blob:') ? (
                 <img
                   src={profileImage}
-                  alt="La Favarotta - Profilo"
+                  alt="Mancia e statti zitto da Sasà - Profilo"
                   className="w-full h-full object-cover"
                   loading="eager"
                   decoding="async"
@@ -233,7 +233,7 @@ export function HomeHero() {
               ) : (
                 <Image
                   src={profileImage}
-                  alt="La Favarotta - Profilo"
+                  alt="Mancia e statti zitto da Sasà - Profilo"
                   fill
                   className="object-cover"
                   priority

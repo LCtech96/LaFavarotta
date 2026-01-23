@@ -5,11 +5,11 @@ import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { MenuList } from '@/components/menu-list'
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lafavarotta.site'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://Mancia e statti zitto da Sasà.site'
 
 export const metadata: Metadata = {
-  title: "Menu - La Favarotta Ristorante Pizzeria Terrasini",
-  description: "Scopri il menu completo del Ristorante La Favarotta a Terrasini. Pizza artigianale, specialità di pesce siciliano, antipasti, primi piatti, secondi e dolci. Piatti tradizionali siciliani preparati con ingredienti freschi e di qualità.",
+  title: "Menu - Mancia e statti zitto da Sasà Ristorante Pizzeria Terrasini",
+  description: "Scopri il menu completo del Ristorante Mancia e statti zitto da Sasà a Terrasini. Pizza artigianale, specialità di pesce siciliano, antipasti, primi piatti, secondi e dolci. Piatti tradizionali siciliani preparati con ingredienti freschi e di qualità.",
   keywords: [
     "menu",
     "menu ristorante",

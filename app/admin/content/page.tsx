@@ -11,11 +11,11 @@ export default function AdminContent() {
   const router = useRouter()
 
   // Restaurant info
-  const [restaurantName, setRestaurantName] = useState('La Favarotta')
-  const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti La Favarotta di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
+  const [restaurantName, setRestaurantName] = useState('Mancia e statti zitto da Sasà')
+  const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti Mancia e statti zitto da Sasà di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
   
   // Descriptions
-  const [desc1, setDesc1] = useState('Benvenuti al Ristorante La Favarotta, un gioiello culinario situato lungo la Strada Statale 113 a Terrasini, nel cuore della Sicilia. La nostra passione per la cucina di pesce freschissimo e la tradizione della pizza siciliana si uniscono per offrirvi un\'esperienza gastronomica indimenticabile.')
+  const [desc1, setDesc1] = useState('Benvenuti al Ristorante Mancia e statti zitto da Sasà, un gioiello culinario situato lungo la Strada Statale 113 a Terrasini, nel cuore della Sicilia. La nostra passione per la cucina di pesce freschissimo e la tradizione della pizza siciliana si uniscono per offrirvi un\'esperienza gastronomica indimenticabile.')
   const [desc2, setDesc2] = useState('Ogni piatto racconta una storia di sapori autentici, preparato con ingredienti selezionati e la maestria che solo l\'amore per la tradizione culinaria siciliana può offrire. Dalle specialità di mare ai nostri piatti di terra, ogni ricetta è un omaggio alla ricchezza del territorio siciliano.')
   const [desc3, setDesc3] = useState('La nostra sala banchetti è il luogo ideale per celebrare i vostri momenti più importanti, mentre il nostro ristorante accoglie ogni giorno chi desidera gustare l\'eccellenza della cucina siciliana in un ambiente elegante e accogliente.')
 

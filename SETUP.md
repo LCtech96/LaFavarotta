@@ -33,9 +33,9 @@ Assicurati di avere tutte le variabili d'ambiente configurate nel file `.env`:
 ```env
 DATABASE_URL="..."
 NEXT_PUBLIC_WHATSAPP_NUMBER="+393276976442"
-NEXT_PUBLIC_EMAIL="lafavarotta@gmail.com"
-NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristorantelaFavarottaterrasini/?locale=it_IT"
-NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/la_favarotta_ristorante_terras"
+NEXT_PUBLIC_EMAIL="Mancia e statti zitto da Sasà@gmail.com"
+NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristoranteMancia e statti zitto da Sasàterrasini/?locale=it_IT"
+NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/Mancia e statti zitto da Sasà_ristorante_terras"
 NEXT_PUBLIC_MAPS_URL="https://maps.app.goo.gl/jbR99NEc53czT4Hj6"
 ```
 

@@ -4,9 +4,9 @@ import { Facebook, Instagram, Mail, Phone } from 'lucide-react'
 
 export function Footer() {
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+393276976442'
-  const email = process.env.NEXT_PUBLIC_EMAIL || 'lafavarotta@gmail.com'
-  const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_URL || 'https://www.facebook.com/ristorantelaFavarottaterrasini/?locale=it_IT'
-  const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/la_favarotta_ristorante_terras'
+  const email = process.env.NEXT_PUBLIC_EMAIL || 'Mancia e statti zitto da Sasà@gmail.com'
+  const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_URL || 'https://www.facebook.com/ristoranteMancia e statti zitto da Sasàterrasini/?locale=it_IT'
+  const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/Mancia e statti zitto da Sasà_ristorante_terras'
 
   return (
     <footer className="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-20 md:mt-32 pb-20 md:pb-8">

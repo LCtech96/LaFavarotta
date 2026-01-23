@@ -1,6 +1,6 @@
 -- ============================================
 -- SCRIPT SQL COMPLETO PER IL DATABASE
--- La Favarotta - Setup Database
+-- Mancia e statti zitto da Sasà - Setup Database
 -- ============================================
 
 -- ============================================

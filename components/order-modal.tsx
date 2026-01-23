@@ -77,7 +77,7 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
                 ⚠️ Importante
               </p>
               <p className="text-sm text-yellow-700 dark:text-yellow-300">
-                Il ristorante La Favarotta <strong>non effettua consegne a domicilio</strong>. 
+                Il ristorante Mancia e statti zitto da Sasà <strong>non effettua consegne a domicilio</strong>. 
                 È necessario ritirare l&apos;ordine presso il ristorante.
               </p>
             </div>

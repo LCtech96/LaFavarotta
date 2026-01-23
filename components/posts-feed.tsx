@@ -223,7 +223,7 @@ export function PostsFeed() {
                 {profileImage.startsWith('data:') || profileImage.startsWith('blob:') ? (
                   <img
                     src={profileImage}
-                    alt="La Favarotta"
+                    alt="Mancia e statti zitto da Sasà"
                     className="w-full h-full object-cover"
                     loading="lazy"
                     decoding="async"
@@ -241,7 +241,7 @@ export function PostsFeed() {
                 ) : (
                   <Image
                     src={profileImage}
-                    alt="La Favarotta"
+                    alt="Mancia e statti zitto da Sasà"
                     fill
                     className="object-cover"
                   />
@@ -249,7 +249,7 @@ export function PostsFeed() {
               </div>
               <div className="flex-1">
                 <h3 className="font-semibold text-gray-900 dark:text-white">
-                  La Favarotta
+                  Mancia e statti zitto da Sasà
                 </h3>
                 <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <Calendar size={12} />

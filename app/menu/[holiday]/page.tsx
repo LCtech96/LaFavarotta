@@ -37,7 +37,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const holidayName = holidayNames[params.holiday] || params.holiday
   return {
     title: `Menu ${holidayName}`,
-    description: `Scopri il menu speciale di ${holidayName} del Ristorante La Favarotta a Terrasini. Piatti tradizionali siciliani per celebrare le festività.`,
+    description: `Scopri il menu speciale di ${holidayName} del Ristorante Mancia e statti zitto da Sasà a Terrasini. Piatti tradizionali siciliani per celebrare le festività.`,
     openGraph: {
       title: `Menu ${holidayName}`,
       description: `Menu speciale di ${holidayName} con piatti tradizionali siciliani`,

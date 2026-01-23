@@ -8,7 +8,7 @@ Per risolvere l'errore "Database non disponibile" su Vercel, devi aggiornare la 
 
 1. **Vai su Vercel Dashboard**
    - Accedi a https://vercel.com/dashboard
-   - Seleziona il progetto `la-favarotta`
+   - Seleziona il progetto `Mancia e statti zitto da Sasà`
 
 2. **Vai alle Environment Variables**
    - Clicca su **Settings** (Impostazioni)

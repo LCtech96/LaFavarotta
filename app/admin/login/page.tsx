@@ -14,7 +14,7 @@ export default function AdminLogin() {
     e.preventDefault()
     setError('')
 
-    if (email === 'lafavarotta@gmail.com' && password === 'Fava2gold') {
+    if (email === 'Mancia e statti zitto da Sasà@gmail.com' && password === 'Fava2gold') {
       // Store auth in sessionStorage
       sessionStorage.setItem('adminAuth', 'true')
       router.push('/admin')

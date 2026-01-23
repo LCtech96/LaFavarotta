@@ -1,14 +1,14 @@
 # Quick Start Guide
 
 ## ✅ Repository GitHub
-Il codice è stato pushato su: https://github.com/LCtech96/LaFavarotta.git
+Il codice è stato pushato su: https://github.com/LCtech96/Mancia e statti zitto da Sasà.git
 
 ## 🔧 Setup Locale
 
 ### 1. Clona il repository (se necessario)
 ```bash
-git clone https://github.com/LCtech96/LaFavarotta.git
-cd LaFavarotta
+git clone https://github.com/LCtech96/Mancia e statti zitto da Sasà.git
+cd Mancia e statti zitto da Sasà
 ```
 
 ### 2. Installa le dipendenze
@@ -22,9 +22,9 @@ Crea un file `.env` nella root del progetto con questa connection string:
 ```env
 DATABASE_URL="postgresql://neondb_owner:npg_o2iTpUByG3Wn@ep-crimson-king-a4292tbj-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 NEXT_PUBLIC_WHATSAPP_NUMBER="+393276976442"
-NEXT_PUBLIC_EMAIL="lafavarotta@gmail.com"
-NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristorantelaFavarottaterrasini/?locale=it_IT"
-NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/la_favarotta_ristorante_terras"
+NEXT_PUBLIC_EMAIL="Mancia e statti zitto da Sasà@gmail.com"
+NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristoranteMancia e statti zitto da Sasàterrasini/?locale=it_IT"
+NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/Mancia e statti zitto da Sasà_ristorante_terras"
 NEXT_PUBLIC_MAPS_URL="https://maps.app.goo.gl/jbR99NEc53czT4Hj6"
 ```
 

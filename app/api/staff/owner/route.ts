@@ -106,7 +106,7 @@ export async function POST(request: NextRequest) {
         data: {
           name: name || 'Leone Vincenzo',
           role: 'Titolare',
-          description: description || 'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato La Favarotta in un punto di riferimento per la gastronomia siciliana.',
+          description: description || 'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato Mancia e statti zitto da Sasà in un punto di riferimento per la gastronomia siciliana.',
           imageUrl
         },
         select: { id: true, imageUrl: true, name: true, description: true }

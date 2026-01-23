@@ -9,7 +9,7 @@ export function StaffSection() {
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [ownerName, setOwnerName] = useState<string>('Leone Vincenzo')
   const [ownerDescription, setOwnerDescription] = useState<string>(
-    'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato La Favarotta in un punto di riferimento per la gastronomia siciliana. La sua dedizione alla qualità e all\'autenticità si riflette in ogni piatto che esce dalla nostra cucina.'
+    'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato Mancia e statti zitto da Sasà in un punto di riferimento per la gastronomia siciliana. La sua dedizione alla qualità e all\'autenticità si riflette in ogni piatto che esce dalla nostra cucina.'
   )
 
   useEffect(() => {
@@ -95,10 +95,10 @@ export function StaffSection() {
       {/* Restaurant Description */}
       <section className="text-center">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          La Favarotta
+          Mancia e statti zitto da Sasà
         </h2>
         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-          Il Ristorante La Favarotta nasce dalla passione per la cucina siciliana e il desiderio 
+          Il Ristorante Mancia e statti zitto da Sasà nasce dalla passione per la cucina siciliana e il desiderio 
           di offrire ai nostri ospiti un&apos;esperienza culinaria autentica e indimenticabile. 
           Situato lungo la Strada Statale 113 a Terrasini, il nostro ristorante unisce la tradizione 
           della cucina di pesce siciliana con l&apos;arte della pizza, creando un menu che celebra 
@@ -197,7 +197,7 @@ export function StaffSection() {
           Il nostro team è composto da professionisti appassionati che condividono l&apos;amore 
           per la cucina siciliana e l&apos;impegno nel garantire a ogni ospite un&apos;esperienza 
           indimenticabile. Dal servizio in sala alla preparazione in cucina, ogni membro del nostro 
-          staff contribuisce a rendere La Favarotta un luogo speciale dove tradizione e qualità si 
+          staff contribuisce a rendere Mancia e statti zitto da Sasà un luogo speciale dove tradizione e qualità si 
           incontrano.
         </p>
       </section>

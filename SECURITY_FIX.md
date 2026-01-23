@@ -22,7 +22,7 @@ Le credenziali del database sono state esposte pubblicamente su GitHub. Questo �
 Dopo aver cambiato la password su Supabase:
 
 1. Vai su https://vercel.com/dashboard
-2. Seleziona il progetto `la-favarotta`
+2. Seleziona il progetto `Mancia e statti zitto da Sasà`
 3. Vai su **Settings** → **Environment Variables**
 4. Trova `DATABASE_URL` e aggiorna con la nuova password:
 

@@ -1,6 +1,6 @@
-# La Favarotta - Sito Web Ristorante
+# Mancia e statti zitto da Sasà - Sito Web Ristorante
 
-Sito web per il Ristorante La Favarotta a Terrasini, Palermo. Realizzato con Next.js, TypeScript e database Neon.
+Sito web per il Ristorante Mancia e statti zitto da Sasà a Terrasini, Palermo. Realizzato con Next.js, TypeScript e database Neon.
 
 ## Caratteristiche
 
@@ -26,7 +26,7 @@ Sito web per il Ristorante La Favarotta a Terrasini, Palermo. Realizzato con Nex
 1. Clona il repository
 ```bash
 git clone <repository-url>
-cd LaFavarotta
+cd Mancia e statti zitto da Sasà
 ```
 
 2. Installa le dipendenze con pnpm
@@ -44,9 +44,9 @@ Oppure crea manualmente il file `.env` con:
 ```env
 DATABASE_URL="postgresql://neondb_owner:npg_o2iTpUByG3Wn@ep-crimson-king-a4292tbj-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
 NEXT_PUBLIC_WHATSAPP_NUMBER="+393276976442"
-NEXT_PUBLIC_EMAIL="lafavarotta@gmail.com"
-NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristorantelaFavarottaterrasini/?locale=it_IT"
-NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/la_favarotta_ristorante_terras"
+NEXT_PUBLIC_EMAIL="Mancia e statti zitto da Sasà@gmail.com"
+NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristoranteMancia e statti zitto da Sasàterrasini/?locale=it_IT"
+NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/Mancia e statti zitto da Sasà_ristorante_terras"
 NEXT_PUBLIC_MAPS_URL="https://maps.app.goo.gl/jbR99NEc53czT4Hj6"
 ```
 
@@ -79,7 +79,7 @@ Apri [http://localhost:3000](http://localhost:3000) nel browser.
 ## Struttura del Progetto
 
 ```
-LaFavarotta/
+Mancia e statti zitto da Sasà/
 ├── app/                    # Pagine Next.js
 │   ├── page.tsx           # Homepage
 │   ├── menu/              # Pagina menu

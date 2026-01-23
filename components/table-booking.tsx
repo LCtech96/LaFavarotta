@@ -44,7 +44,7 @@ export function TableBooking() {
       day: 'numeric',
     })
 
-    let message = `*Prenotazione Tavolo - La Favarotta*\n\n`
+    let message = `*Prenotazione Tavolo - Mancia e statti zitto da Sasà*\n\n`
     message += `*Dati Prenotazione:*\n`
     message += `📅 Data: ${formattedDate}\n`
     message += `🕐 Orario: ${formData.time}\n`

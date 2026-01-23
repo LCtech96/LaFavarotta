@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { ThemeProvider } from "@/components/theme-provider";
 
-const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://lafavarotta.site';
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://Mancia e statti zitto da Sasà.site';
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
         url: `${siteUrl}/cover-image.png`,
         width: 1200,
         height: 630,
-        alt: "La Favarotta Ristorante Pizzeria Terrasini",
+        alt: "Mancia e statti zitto da Sasà Ristorante Pizzeria Terrasini",
       },
     ],
   },

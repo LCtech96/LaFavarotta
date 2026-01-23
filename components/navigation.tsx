@@ -25,7 +25,7 @@ export function Navigation() {
       <nav className="hidden md:flex fixed top-0 left-0 right-0 z-50 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 shadow-sm">
         <div className="container mx-auto px-4 py-3 flex items-center justify-between">
           <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
-            La Favarotta
+            Mancia e statti zitto da Sasà
           </Link>
           <div className="flex items-center gap-6">
             {navItems.map((item) => {
