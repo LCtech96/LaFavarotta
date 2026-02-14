@@ -1,17 +1,31 @@
 'use client'
 
-import { Facebook, Instagram, Mail, Phone } from 'lucide-react'
+import { Facebook, Instagram, Mail, MapPin, Phone } from 'lucide-react'
+import { getAddress, getMapsUrl, getWhatsappNumber, getWhatsappUrl } from '@/lib/constants'
 
 export function Footer() {
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+393276976442'
+  const whatsappNumber = getWhatsappNumber()
+  const whatsappUrl = getWhatsappUrl()
+  const address = getAddress()
+  const mapsUrl = getMapsUrl()
   const email = process.env.NEXT_PUBLIC_EMAIL || 'Mancia e statti zitto da Sasà@gmail.com'
-  const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_URL || 'https://www.facebook.com/ristoranteMancia e statti zitto da Sasàterrasini/?locale=it_IT'
-  const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || 'https://www.instagram.com/Mancia e statti zitto da Sasà_ristorante_terras'
+  const facebookUrl = process.env.NEXT_PUBLIC_FACEBOOK_URL || '#'
+  const instagramUrl = process.env.NEXT_PUBLIC_INSTAGRAM_URL || '#'
 
   return (
     <footer className="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-20 md:mt-32 pb-20 md:pb-8">
       <div className="container mx-auto px-4 py-8">
         <div className="flex flex-col md:flex-row items-center justify-center gap-6 md:gap-8">
+          <a
+            href={mapsUrl}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
+          >
+            <MapPin size={24} />
+            <span className="hidden md:inline">{address}</span>
+            <span className="md:hidden">Dove siamo</span>
+          </a>
           <a
             href={facebookUrl}
             target="_blank"
@@ -21,7 +35,6 @@ export function Footer() {
             <Facebook size={24} />
             <span className="hidden md:inline">Facebook</span>
           </a>
-          
           <a
             href={`mailto:${email}`}
             className="flex items-center gap-2 text-gray-700 dark:text-gray-300 hover:text-gray-900 dark:hover:text-white transition-colors"
@@ -30,9 +43,8 @@ export function Footer() {
             <span className="hidden md:inline">{email}</span>
             <span className="md:hidden">Email</span>
           </a>
-          
           <a
-            href={`https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}`}
+            href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors"
@@ -41,7 +53,6 @@ export function Footer() {
             <span className="hidden md:inline">{whatsappNumber}</span>
             <span className="md:hidden">WhatsApp</span>
           </a>
-          
           <a
             href={instagramUrl}
             target="_blank"
@@ -52,7 +63,9 @@ export function Footer() {
             <span className="hidden md:inline">Instagram</span>
           </a>
         </div>
-        
+        <div className="mt-6 text-center text-sm text-gray-600 dark:text-gray-400">
+          <p>{address}</p>
+        </div>
         <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
           <p className="mb-2">
             Creato da{' '}

@@ -15,7 +15,7 @@ export function TableBooking() {
     notes: '',
   })
 
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+393276976442'
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+39 379 267 5864'
 
   // Ottieni la data minima (oggi)
   const getMinDate = () => {

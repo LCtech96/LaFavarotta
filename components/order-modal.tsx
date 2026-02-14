@@ -21,7 +21,7 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
 
   if (!isOpen) return null
 
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+393276976442'
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+39 379 267 5864'
 
   const handleSubmit = () => {
     let message = `*Nuovo Ordine - Da Asporto*\n\n`

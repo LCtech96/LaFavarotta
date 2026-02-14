@@ -53,9 +53,14 @@ export async function GET(
     })
 
     if (content?.value) {
-      return NextResponse.json({ 
-        imageUrl: content.value 
-      })
+      return NextResponse.json(
+        { imageUrl: content.value },
+        {
+          headers: {
+            'Cache-Control': 'no-store, max-age=0',
+          },
+        }
+      )
     }
 
     // Fallback: prova a recuperare dal MenuItem (per retrocompatibilità)
@@ -64,9 +69,14 @@ export async function GET(
       select: { imageUrl: true }
     })
 
-    return NextResponse.json({ 
-      imageUrl: menuItem?.imageUrl || null 
-    })
+    return NextResponse.json(
+      { imageUrl: menuItem?.imageUrl || null },
+      {
+        headers: {
+          'Cache-Control': 'no-store, max-age=0',
+        },
+      }
+    )
   } catch (error) {
     console.error('Error fetching menu item image:', error)
     const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'

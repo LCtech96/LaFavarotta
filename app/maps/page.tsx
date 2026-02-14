@@ -7,7 +7,7 @@ import { Footer } from '@/components/footer'
 import { useEffect } from 'react'
 
 export default function MapsPage() {
-  const mapsUrl = process.env.NEXT_PUBLIC_MAPS_URL || '-----'
+  const mapsUrl = process.env.NEXT_PUBLIC_MAPS_URL || 'https://maps.app.goo.gl/2ZQ74WrGo7Xe3bEBA?g_st=ic'
 
   useEffect(() => {
     // Redirect to Google Maps

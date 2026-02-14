@@ -6,7 +6,7 @@ import { base64ToBlobUrl, isAndroid } from '@/lib/utils'
 
 export function HomeHero() {
   const [restaurantName, setRestaurantName] = useState('Mancia e statti zitto da Sasà')
-  const [restaurantSubtitle, setRestaurantSubtitle] = useState('Ristorante Pizzeria sala banchetti Mancia e statti zitto da Sasà di Leone Vincenzo & cS.S. 113 Terrasini (PA)')
+  const [restaurantSubtitle, setRestaurantSubtitle] = useState('Street food palermitano a conduzione familiare nel cuore di Terrasini (PA). Via R. Ruffino, 9 — vicino all\'aeroporto Falcone e Borsellino.')
   
   // MODIFICATO: Impostiamo il tuo file reale come immagine di copertina predefinita
   const [coverImage, setCoverImage] = useState('/copertina.png.jpg')
@@ -160,22 +160,23 @@ export function HomeHero() {
   }, [])
 
   return (
-    <section className="relative h-[60vh] md:h-[80vh] w-full overflow-hidden">
-      {/* Immagine di Copertina */}
-      <div className="absolute inset-0">
+    <section className="relative w-full overflow-hidden">
+      {/* Immagine di copertina: proporzione fissa e object-top per non tagliare il testo del cartello */}
+      <div className="relative w-full aspect-[2/1] min-h-[280px] md:aspect-[21/9] md:min-h-[320px]">
         <Image
           src={coverImage}
           alt="Ristorante Cover"
           fill
-          className="object-cover transition-opacity duration-700"
+          className="object-cover object-top transition-opacity duration-700"
           priority
+          sizes="100vw"
         />
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      <div className="relative h-full max-w-7xl mx-auto px-4 flex flex-col items-center justify-center text-center text-white">
-        {/* Immagine Profilo Sasà */}
-        <div className="relative w-32 h-32 md:w-48 md:h-48 mb-6 rounded-full border-4 border-white overflow-hidden shadow-xl bg-gray-200">
+      {/* Contenuto (logo, nome, sottotitolo) sotto la copertina per non coprire il testo */}
+      <div className="relative -mt-16 md:-mt-24 pb-8 max-w-7xl mx-auto px-4 flex flex-col items-center justify-center text-center text-white">
+        <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white overflow-hidden shadow-xl bg-gray-200 flex-shrink-0">
           {!isProfileLoading && profileImage && (
             <Image
               src={profileImage}
@@ -183,14 +184,14 @@ export function HomeHero() {
               fill
               className="object-cover"
               priority
+              sizes="128px"
             />
           )}
         </div>
-        
-        <h1 className="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg">
+        <h1 className="text-3xl md:text-5xl font-bold mt-4 mb-2 drop-shadow-lg">
           {restaurantName}
         </h1>
-        <p className="text-lg md:text-xl max-w-2xl drop-shadow-md">
+        <p className="text-base md:text-lg max-w-2xl drop-shadow-md">
           {restaurantSubtitle}
         </p>
       </div>

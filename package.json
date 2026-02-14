@@ -7,7 +7,8 @@
     "build": "prisma generate && next build",
     "start": "next start",
     "lint": "next lint",
-    "postinstall": "prisma generate"
+    "postinstall": "prisma generate",
+    "load-menu-images": "node scripts/load-menu-images.mjs"
   },
   "dependencies": {
     "@neondatabase/serverless": "^0.9.0",

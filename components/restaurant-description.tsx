@@ -3,9 +3,9 @@
 import { useState, useEffect } from 'react'
 
 export function RestaurantDescription() {
-  const [desc1, setDesc1] = useState('Benvenuti al Ristorante Mancia e statti zitto da Sasà, un gioiello culinario situato lungo la Strada Statale 113 a Terrasini, nel cuore della Sicilia. La nostra passione per la cucina di pesce freschissimo e la tradizione della pizza siciliana si uniscono per offrirvi un\'esperienza gastronomica indimenticabile.')
-  const [desc2, setDesc2] = useState('Ogni piatto racconta una storia di sapori autentici, preparato con ingredienti selezionati e la maestria che solo l\'amore per la tradizione culinaria siciliana può offrire. Dalle specialità di mare ai nostri piatti di terra, ogni ricetta è un omaggio alla ricchezza del territorio siciliano.')
-  const [desc3, setDesc3] = useState('La nostra sala banchetti è il luogo ideale per celebrare i vostri momenti più importanti, mentre il nostro ristorante accoglie ogni giorno chi desidera gustare l\'eccellenza della cucina siciliana in un ambiente elegante e accogliente.')
+  const [desc1, setDesc1] = useState('Benvenuti nel nostro street food palermitano a conduzione familiare, nel cuore di Terrasini, in provincia di Palermo. A pochi minuti dall\'aeroporto Falcone e Borsellino, vi aspettiamo con il pane con la milza e il pane con le panelle più buone e fresche, pizze tradizionali e le specialità dello street food siciliano.')
+  const [desc2, setDesc2] = useState('La nostra passione per la cucina di strada palermitana si unisce alla tradizione familiare: ingredienti freschi, ricette autentiche e l\'accoglienza di chi fa del cibo un momento di condivisione. Pane ca meusa, panelle e crocchè, pizze tradizionali cotte nel forno a legna e tante altre specialità per un pranzo o una cena vicino all\'aeroporto Falcone e Borsellino.')
+  const [desc3, setDesc3] = useState('Terrasini e la provincia di Palermo hanno nel nostro locale un punto di riferimento per lo street food e la pizza. Venite a trovarci in Via R. Ruffino 9, 90049 Terrasini: siamo aperti per voi con il meglio della tradizione palermitana e siciliana.')
 
   useEffect(() => {
     const saved1 = localStorage.getItem('content_desc1')
