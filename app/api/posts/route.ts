@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
+// Evita cache: nuovo post deve apparire subito in home (tra Prenota tavolo e Benvenuti...)
+export const dynamic = 'force-dynamic'
+export const revalidate = 0
+
 // GET - Recupera tutti i post
 export async function GET(request: NextRequest) {
   try {
@@ -32,7 +36,14 @@ export async function GET(request: NextRequest) {
       createdAt: post.createdAt.toISOString()
     }))
 
-    return NextResponse.json({ posts: formattedPosts })
+    return NextResponse.json(
+      { posts: formattedPosts },
+      {
+        headers: {
+          'Cache-Control': 'no-store, no-cache, must-revalidate, max-age=0',
+        },
+      }
+    )
   } catch (error) {
     console.error('Error fetching posts:', error)
     const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
