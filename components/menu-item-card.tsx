@@ -6,7 +6,6 @@ import { type MenuItem } from '@/data/menu-data'
 import { formatPrice, base64ToBlobUrl, isAndroid } from '@/lib/utils'
 import { useCartStore } from '@/store/cart-store'
 import { MenuItemModal } from './menu-item-modal'
-import { Fish, Pizza } from 'lucide-react'
 
 interface MenuItemCardProps {
   item: MenuItem
@@ -65,13 +64,6 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
     'Porchetta': '/porchetta.png',
     'Tiramisù': '/Tiramisu\'.png',
   }
-
-  const isPizza = item.categoryId === 4
-  const isFishDish =
-    item.allergens?.some((a) => {
-      const lower = a.toLowerCase()
-      return lower.includes('pesce') || lower.includes('molluschi')
-    }) ?? false
 
   useEffect(() => {
     // Load image from database with localStorage fallback
@@ -234,12 +226,6 @@ export function MenuItemCard({ item }: MenuItemCardProps) {
             <h3 className="text-lg font-semibold text-gray-900 dark:text-white flex-1">
               {item.name}
             </h3>
-            {(isFishDish || isPizza) && (
-              <div className="flex items-center ml-2 text-blue-400">
-                {isFishDish && <Fish size={18} />}
-                {!isFishDish && isPizza && <Pizza size={18} />}
-              </div>
-            )}
           </div>
           {item.description && (
             <p className="text-sm text-gray-600 dark:text-gray-400 mb-2 line-clamp-2">
