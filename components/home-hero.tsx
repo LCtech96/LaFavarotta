@@ -174,9 +174,9 @@ export function HomeHero() {
         <div className="absolute inset-0 bg-black/40" />
       </div>
 
-      {/* Contenuto (logo, nome, sottotitolo) sotto la copertina per non coprire il testo */}
-      <div className="relative -mt-16 md:-mt-24 pb-8 max-w-7xl mx-auto px-4 flex flex-col items-center justify-center text-center text-white">
-        <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white overflow-hidden shadow-xl bg-gray-200 flex-shrink-0">
+      {/* Contenuto (logo, nome, sottotitolo): in light mode sfondo chiaro e testo nero per contrasto */}
+      <div className="relative -mt-16 md:-mt-24 pb-8 max-w-7xl mx-auto px-4 flex flex-col items-center justify-center text-center bg-white/95 dark:bg-transparent py-4 rounded-t-2xl">
+        <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white dark:border-white overflow-hidden shadow-xl bg-gray-200 flex-shrink-0 ring-2 ring-gray-200 dark:ring-gray-700">
           {!isProfileLoading && profileImage && (
             <Image
               src={profileImage}
@@ -188,10 +188,10 @@ export function HomeHero() {
             />
           )}
         </div>
-        <h1 className="text-3xl md:text-5xl font-bold mt-4 mb-2 drop-shadow-lg">
+        <h1 className="text-3xl md:text-5xl font-bold mt-4 mb-2 text-gray-900 dark:text-white drop-shadow-none dark:drop-shadow-lg">
           {restaurantName}
         </h1>
-        <p className="text-base md:text-lg max-w-2xl drop-shadow-md">
+        <p className="text-base md:text-lg max-w-2xl text-gray-800 dark:text-white drop-shadow-none dark:drop-shadow-md">
           {restaurantSubtitle}
         </p>
       </div>

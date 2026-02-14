@@ -10,26 +10,22 @@ export function Footer() {
   return (
     <footer className="bg-gray-100 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-20 md:mt-32 pb-20 md:pb-8">
       <div className="container mx-auto px-4 py-8">
-        <div className="flex flex-col items-center justify-center gap-4">
+        <div className="flex flex-col items-center justify-center gap-2">
           <a
             href={whatsappUrl}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 transition-colors font-medium"
+            className="flex items-center justify-center w-14 h-14 rounded-full text-green-600 dark:text-green-400 hover:text-green-700 dark:hover:text-green-300 hover:bg-green-50 dark:hover:bg-green-900/20 transition-colors"
+            title="Apri WhatsApp"
+            aria-label="Apri WhatsApp"
           >
-            <MessageCircle size={28} />
-            <span>WhatsApp {whatsappNumber}</span>
+            <MessageCircle size={32} />
           </a>
-          <a
-            href={whatsappUrl}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-sm text-gray-500 dark:text-gray-400 hover:underline"
-          >
-            https://wa.me/393792675864
-          </a>
+          <p className="text-sm text-gray-700 dark:text-gray-300">
+            {whatsappNumber}
+          </p>
         </div>
-        <div className="mt-8 text-center text-sm text-gray-600 dark:text-gray-400">
+        <div className="mt-8 text-center text-sm text-gray-700 dark:text-gray-400">
           <p className="mb-2">
             Creato da{' '}
             <a
