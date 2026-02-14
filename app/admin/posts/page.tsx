@@ -148,6 +148,8 @@ export default function AdminPosts() {
         window.dispatchEvent(new CustomEvent('postsUpdated', { 
           detail: { posts: updatedPosts } 
         }))
+
+        alert('Post eliminato.')
       } catch (error) {
         console.error('Error deleting post:', error)
         const errorMessage = error instanceof Error ? error.message : 'Errore nell\'eliminazione del post. Riprova più tardi.'
@@ -404,6 +406,16 @@ export default function AdminPosts() {
                       year: 'numeric',
                     })}
                   </p>
+                  <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(post.id)}
+                      className="inline-flex items-center gap-2 px-3 py-1.5 text-sm bg-red-600 text-white rounded-lg hover:bg-red-700 transition-colors"
+                    >
+                      <Trash2 size={16} />
+                      Elimina post
+                    </button>
+                  </div>
                 </div>
               </div>
             ))
