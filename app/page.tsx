@@ -11,31 +11,18 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || '---'
 
 export const metadata: Metadata = {
   title: "- Ristorante Pizzeria Terrasini | Cucina Siciliana e Pizza",
-  description: "Ristorante. Cucina siciliana tradizionale, pizza artigianale e sala banchetti. Specialità di pesce, piatti tipici siciliani e pizza napoletana. Prenota il tuo tavolo o ordina da asporto. Strada Statale 113, Terrasini.",
+  description: "Cucina siciliana tradizionale e pizza artigianale. Piatti tipici siciliani. Prenota il tuo tavolo o ordina da asporto. Strada Statale 113, Terrasini.",
   keywords: [
-    "ristorante Terrasini",
-    "pizzeria Terrasini",
-    "ristorante Palermo",
-    "cucina siciliana",
-    "pizza Terrasini",
-    "sala banchetti Terrasini",
-    "ristorante pesce Terrasini",
-    "cena Terrasini",
-    "pranzo Terrasini",
-    "ristorante SS113",
-    "--",
-    "ristorante Sicilia",
-    "pizza artigianale Terrasini",
-    "cucina tradizionale siciliana",
-    "ristorante famiglia Terrasini",
-    "eventi Terrasini",
-    "banchetti Terrasini"
+    "ristorante Terrasini", "pizzeria Terrasini", "ristorante Palermo", "cucina siciliana",
+    "pizza Terrasini", "Street food Terrasini", "cena Terrasini", "pranzo Terrasini",
+    "ristorante Sicilia", "pizza artigianale Terrasini", "cucina tradizionale siciliana"
   ],
   openGraph: {
     title: "Cucina Siciliana",
-    description: "Cucina siciliana tradizionale, pizza artigianale e sala banchetti. Specialità di pesce e piatti tipici siciliani.",
+    description: "Cucina siciliana tradizionale e pizza artigianale. Piatti tipici siciliani.",
     url: siteUrl,
-    images: [`${siteUrl}/cover-image.png`],
+    // AGGIORNATO: Ora punta alla tua nuova copertina
+    images: [`${siteUrl}/copertina.png.jpg`],
   },
   alternates: {
     canonical: siteUrl,
@@ -46,38 +33,24 @@ export default function Home() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Restaurant",
-    "name": "---",
-    "image": `${siteUrl}/cover-image.png`,
-    "description": "Cucina siciliana tradizionale, pizza artigianale e sala banchetti.",
+    "name": "La Favarotta",
+    // AGGIORNATO: Immagine per i risultati Google
+    "image": `${siteUrl}/copertina.png.jpg`,
+    "description": "Cucina siciliana tradizionale e pizza artigianale.",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Strada Statale 113",
+      "streetAddress": "Via R. Ruffino, 9, 90049 Terrasini PA",
       "addressLocality": "Terrasini",
       "addressRegion": "PA",
       "postalCode": "90049",
       "addressCountry": "IT"
     },
-    "geo": {
-      "@type": "GeoCoordinates",
-      "latitude": "---",
-      "longitude": "---"
-    },
     "url": siteUrl,
-    "telephone": process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "+393276976442",
+    "telephone": "+393792675864",
     "servesCuisine": ["Italian", "Sicilian", "Pizza", "Seafood"],
     "priceRange": "€€",
-    "openingHoursSpecification": [
-      {
-        "@type": "OpeningHoursSpecification",
-        "dayOfWeek": ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"],
-        "opens": "12:00",
-        "closes": "23:00"
-      }
-    ],
     "hasMenu": `${siteUrl}/menu`,
     "acceptsReservations": "True",
-    "paymentAccepted": "Cash, Credit Card",
-    "currenciesAccepted": "EUR"
   }
 
   return (
@@ -89,6 +62,9 @@ export default function Home() {
       <main className="min-h-screen">
         <Navigation />
         <div className="pt-16 md:pt-20">
+          {/* NOTA: L'immagine del profilo "sasa.png.jpg" e la copertina 
+              sono gestite dentro il componente <HomeHero />.
+          */}
           <HomeHero />
           <Highlights />
           <TableBooking />
