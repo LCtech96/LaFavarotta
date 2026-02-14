@@ -130,13 +130,15 @@ export default function AdminPosts() {
     if (confirm('Sei sicuro di voler eliminare questo post?')) {
       try {
         // Elimina dal database
-        const response = await fetch(`/api/posts?id=${postId}`, {
+        const response = await fetch(`/api/posts?id=${encodeURIComponent(postId)}`, {
           method: 'DELETE',
+          headers: { 'Content-Type': 'application/json' },
         })
 
+        const data = await response.json().catch(() => ({}))
         if (!response.ok) {
-          const errorData = await response.json().catch(() => ({ error: 'Errore sconosciuto' }))
-          throw new Error(errorData.error || 'Errore nell\'eliminazione del post')
+          const msg = data.details || data.error || 'Errore nell\'eliminazione del post'
+          throw new Error(msg)
         }
 
         const updatedPosts = posts.filter(p => p.id !== postId)
@@ -382,13 +384,6 @@ export default function AdminPosts() {
                       height: 'auto'
                     }}
                   />
-                  <button
-                    onClick={() => handleDelete(post.id)}
-                    className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-full hover:bg-red-700 transition-colors"
-                    title="Elimina post"
-                  >
-                    <Trash2 size={16} />
-                  </button>
                 </div>
                 <div className="p-4">
                   {post.title && (

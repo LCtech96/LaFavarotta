@@ -145,15 +145,15 @@ export async function DELETE(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams
     const postId = searchParams.get('id')
 
-    if (!postId) {
+    if (!postId || postId.trim() === '') {
       return NextResponse.json(
         { error: 'ID post non fornito' },
         { status: 400 }
       )
     }
 
-    const id = parseInt(postId)
-    if (isNaN(id)) {
+    const id = parseInt(postId.trim(), 10)
+    if (isNaN(id) || id < 1) {
       return NextResponse.json(
         { error: 'ID post non valido' },
         { status: 400 }
@@ -167,29 +167,25 @@ export async function DELETE(request: NextRequest) {
       )
     }
 
-    await prisma.post.delete({
-      where: { id }
+    const result = await prisma.post.deleteMany({
+      where: { id },
     })
 
-    return NextResponse.json({ 
-      success: true
-    })
-  } catch (error) {
-    console.error('Error deleting post:', error)
-    const errorMessage = error instanceof Error ? error.message : 'Errore sconosciuto'
-    
-    // Se il post non esiste, restituisci un errore 404
-    if (errorMessage.includes('Record to delete does not exist') || errorMessage.includes('not found')) {
+    if (result.count === 0) {
       return NextResponse.json(
-        { error: 'Post non trovato' },
+        { error: 'Post non trovato o già eliminato' },
         { status: 404 }
       )
     }
-    
+
+    return NextResponse.json({ success: true })
+  } catch (error: unknown) {
+    console.error('Error deleting post:', error)
+    const message = error instanceof Error ? error.message : String(error)
     return NextResponse.json(
-      { 
+      {
         error: 'Errore nell\'eliminazione del post',
-        details: errorMessage
+        details: message,
       },
       { status: 500 }
     )
