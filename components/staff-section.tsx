@@ -2,11 +2,13 @@
 
 import { useState, useEffect } from 'react'
 import Image from 'next/image'
+import { X } from 'lucide-react'
 import { base64ToBlobUrl, isAndroid } from '@/lib/utils'
 
 export function StaffSection() {
   const [ownerImage, setOwnerImage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
+  const [fullscreenOwner, setFullscreenOwner] = useState(false)
   const [ownerName, setOwnerName] = useState<string>('Massimiliano Andriolo')
   const [ownerDescription, setOwnerDescription] = useState<string>(
     'Massimiliano Andriolo, pizzaiolo e titolare, porta avanti con passione la tradizione dello street food palermitano e della pizza a Terrasini. Conduzione familiare nel cuore di Terrasini, vicino all\'aeroporto Falcone e Borsellino.'
@@ -90,6 +92,19 @@ export function StaffSection() {
     }
   }, [])
 
+  useEffect(() => {
+    if (fullscreenOwner) document.body.style.overflow = 'hidden'
+    else document.body.style.overflow = ''
+    return () => { document.body.style.overflow = '' }
+  }, [fullscreenOwner])
+
+  useEffect(() => {
+    if (!fullscreenOwner) return
+    const onEscape = (e: KeyboardEvent) => { if (e.key === 'Escape') setFullscreenOwner(false) }
+    window.addEventListener('keydown', onEscape)
+    return () => window.removeEventListener('keydown', onEscape)
+  }, [fullscreenOwner])
+
   return (
     <div className="max-w-4xl mx-auto space-y-12">
       {/* Restaurant Description */}
@@ -114,7 +129,13 @@ export function StaffSection() {
           Il Pizzaiolo e Titolare
         </h2>
         <div className="flex flex-col md:flex-row gap-6">
-          <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0 mx-auto md:mx-0 overflow-hidden relative">
+          <button
+            type="button"
+            onClick={() => ownerImage && setFullscreenOwner(true)}
+            className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0 mx-auto md:mx-0 overflow-hidden relative cursor-pointer border-0 p-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+            aria-label="Apri immagine a schermo intero"
+            disabled={!ownerImage}
+          >
             {!isLoading && ownerImage ? (
               ownerImage.startsWith('data:') || ownerImage.startsWith('blob:') ? (
                 <img
@@ -145,7 +166,7 @@ export function StaffSection() {
                 />
               )
             ) : null}
-          </div>
+          </button>
           <div className="flex-1">
             <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
               {ownerName}
@@ -156,6 +177,43 @@ export function StaffSection() {
           </div>
         </div>
       </section>
+
+      {/* Lightbox immagine Massimiliano */}
+      {fullscreenOwner && ownerImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"
+          role="dialog"
+          aria-modal="true"
+          aria-label="Immagine a schermo intero"
+        >
+          <button
+            type="button"
+            onClick={() => setFullscreenOwner(false)}
+            className="absolute top-4 right-4 z-10 p-2 rounded-full bg-white/10 hover:bg-white/20 text-white transition-colors"
+            aria-label="Chiudi"
+          >
+            <X size={28} />
+          </button>
+          <button
+            type="button"
+            onClick={() => setFullscreenOwner(false)}
+            className="absolute bottom-6 left-1/2 -translate-x-1/2 px-6 py-2 rounded-lg bg-white/10 hover:bg-white/20 text-white font-medium transition-colors"
+          >
+            Torna indietro
+          </button>
+          <div
+            className="absolute inset-0 flex items-center justify-center p-4"
+            onClick={() => setFullscreenOwner(false)}
+          >
+            <img
+              src={ownerImage}
+              alt={ownerName}
+              className="max-w-full max-h-full w-auto h-auto object-contain"
+              onClick={(e) => e.stopPropagation()}
+            />
+          </div>
+        </div>
+      )}
 
       {/* Staff */}
       <section>
