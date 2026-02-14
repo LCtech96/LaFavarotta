@@ -15,6 +15,7 @@ export function TableBooking() {
     notes: '',
   })
 
+  const whatsappUrl = 'https://wa.me/393792675864'
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+39 379 267 5864'
 
   // Ottieni la data minima (oggi)
@@ -56,8 +57,8 @@ export function TableBooking() {
       message += `\n*Note:*\n${formData.notes}\n`
     }
 
-    const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`
-    window.open(whatsappUrl, '_blank')
+    const urlWithMessage = `${whatsappUrl}?text=${encodeURIComponent(message)}`
+    window.open(urlWithMessage, '_blank')
     
     // Reset form
     setFormData({

@@ -7,9 +7,9 @@ import { base64ToBlobUrl, isAndroid } from '@/lib/utils'
 export function StaffSection() {
   const [ownerImage, setOwnerImage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
-  const [ownerName, setOwnerName] = useState<string>('Leone Vincenzo')
+  const [ownerName, setOwnerName] = useState<string>('Massimiliano Andriolo')
   const [ownerDescription, setOwnerDescription] = useState<string>(
-    'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato Mancia e statti zitto da Sasà in un punto di riferimento per la gastronomia siciliana. La sua dedizione alla qualità e all\'autenticità si riflette in ogni piatto che esce dalla nostra cucina.'
+    'Massimiliano Andriolo, pizzaiolo e titolare, porta avanti con passione la tradizione dello street food palermitano e della pizza a Terrasini. Conduzione familiare nel cuore di Terrasini, vicino all\'aeroporto Falcone e Borsellino.'
   )
 
   useEffect(() => {
@@ -98,23 +98,20 @@ export function StaffSection() {
           Mancia e statti zitto da Sasà
         </h2>
         <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
-          Il Ristorante Mancia e statti zitto da Sasà nasce dalla passione per la cucina siciliana e il desiderio 
-          di offrire ai nostri ospiti un&apos;esperienza culinaria autentica e indimenticabile. 
-          Situato lungo la Strada Statale 113 a Terrasini, il nostro ristorante unisce la tradizione 
-          della cucina di pesce siciliana con l&apos;arte della pizza, creando un menu che celebra 
-          i sapori del territorio.
+          Street food palermitano a conduzione familiare nel cuore di Terrasini, in provincia di Palermo. 
+          A pochi minuti dall&apos;aeroporto Falcone e Borsellino, vi aspettiamo con il pane con la milza, 
+          il pane con le panelle più buone e fresche, pizze tradizionali e le specialità dello street food siciliano.
         </p>
         <p className="text-gray-700 dark:text-gray-300 leading-relaxed mt-4">
-          La nostra sala banchetti è il luogo ideale per celebrare i momenti più importanti della vita, 
-          mentre il ristorante accoglie ogni giorno chi desidera gustare l&apos;eccellenza della cucina 
-          siciliana in un ambiente elegante e accogliente.
+          La nostra passione per la cucina di strada palermitana si unisce alla tradizione familiare: 
+          ingredienti freschi, ricette autentiche e l&apos;accoglienza di chi fa del cibo un momento di condivisione.
         </p>
       </section>
 
-      {/* Owner */}
+      {/* Pizzaiolo e Titolare */}
       <section className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-          Il Titolare
+          Il Pizzaiolo e Titolare
         </h2>
         <div className="flex flex-col md:flex-row gap-6">
           <div className="w-32 h-32 bg-gray-200 dark:bg-gray-700 rounded-full flex-shrink-0 mx-auto md:mx-0 overflow-hidden relative">
@@ -155,34 +152,6 @@ export function StaffSection() {
             </h3>
             <p className="text-gray-700 dark:text-gray-300 leading-relaxed">
               {ownerDescription}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* Chefs */}
-      <section>
-        <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-6">
-          I Nostri Chef
-        </h2>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
-              Chef del Pesce
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Il nostro chef specializzato in cucina di pesce seleziona quotidianamente il pesce 
-              più fresco dai mercati locali, preparando piatti che esaltano i sapori del mare siciliano.
-            </p>
-          </div>
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
-            <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-2 text-center">
-              Pizzaiolo
-            </h3>
-            <p className="text-gray-700 dark:text-gray-300 leading-relaxed text-center">
-              Il nostro pizzaiolo maestro porta avanti la tradizione della pizza siciliana, 
-              utilizzando ingredienti di prima qualità e tecniche artigianali per creare pizze 
-              uniche e deliziose.
             </p>
           </div>
         </div>

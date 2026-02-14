@@ -8,20 +8,20 @@ import { StaffSection } from '@/components/staff-section'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mancia-e-statti-zitto-da-sasa.site'
 
 export const metadata: Metadata = {
-  title: "Chi Siamo - [nome ristorante]",
-  description: "descrizione",
+  title: "Chi Siamo - Street food palermitano Terrasini | Mancia e statti zitto da Sasà",
+  description: "Street food palermitano a conduzione familiare nel cuore di Terrasini. Il pizzaiolo e titolare Massimiliano Andriolo e il nostro staff. Vicino aeroporto Falcone e Borsellino.",
   keywords: [
-    "--- -------- storia",
-    "ristorante Terrasini storia",
-    "Nome titolare",
-    "chef",
-    "cucina siciliana tradizionale",
-    "ristorante",
-    "staff"
+    "chi siamo",
+    "street food Terrasini",
+    "conduzione familiare",
+    "Massimiliano Andriolo",
+    "pizzaiolo Terrasini",
+    "staff Terrasini",
+    "Mancia e statti zitto da Sasà",
   ],
   openGraph: {
-    title: "Chi Siamo",
-    description: "--------",
+    title: "Chi Siamo - Mancia e statti zitto da Sasà",
+    description: "Street food palermitano a conduzione familiare a Terrasini. Il nostro staff.",
     url: `${siteUrl}/chi-siamo`,
     images: [`${siteUrl}/cover-image.png`],
   },
