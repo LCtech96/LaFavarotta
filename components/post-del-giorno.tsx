@@ -24,7 +24,7 @@ export function PostDelGiorno() {
     if (!mounted) return
     const load = async () => {
       try {
-        const res = await fetch('/api/posts', { cache: 'no-store' })
+        const res = await fetch(`/api/posts?_=${Date.now()}`, { cache: 'no-store' })
         if (!res.ok) return
         const data = await res.json()
         const list = data.posts

@@ -5,16 +5,18 @@ const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined
 }
 
-/** In serverless (Vercel) evita "MaxClientsInSessionMode: max clients reached" limitando 1 connessione per istanza */
+/** In serverless (Vercel) evita "MaxClientsInSessionMode" e compatibilità con Supabase Transaction mode (porta 6543) */
 function getDatabaseUrl(): string | undefined {
-  const url = process.env.DATABASE_URL
+  let url = process.env.DATABASE_URL
   if (!url) return url
-  // In produzione: sempre 1 connessione per istanza (Supabase/Neon hanno limite sul pool)
-  if (process.env.NODE_ENV === 'production') {
-    const sep = url.includes('?') ? '&' : '?'
-    const withLimit = `${url}${sep}connection_limit=1`
-    // Evita di aggiungere due volte se già presente
-    return withLimit.includes('connection_limit=') ? url : withLimit
+  const sep = url.includes('?') ? '&' : '?'
+  // Porta 6543 = Transaction mode Supabase: Prisma deve usare pgbouncer=true (no prepared statements)
+  if (url.includes(':6543/')) {
+    url = url.includes('pgbouncer=true') ? url : `${url}${sep}pgbouncer=true`
+  }
+  // In produzione: 1 connessione per istanza per non saturare il pool
+  if (process.env.NODE_ENV === 'production' && !url.includes('connection_limit=')) {
+    url = `${url}${url.includes('?') ? '&' : '?'}connection_limit=1`
   }
   return url
 }
