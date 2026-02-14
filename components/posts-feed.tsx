@@ -97,11 +97,11 @@ export function PostsFeed() {
               return post
             })
             
-            // Ordina per data (più recenti prima)
+            // Ordina per data (più recenti prima); il primo è il "post del giorno" (mostrato sopra), qui mostriamo dal secondo in poi
             const sorted = processedPosts.sort((a: Post, b: Post) => 
               new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
             )
-            setPosts(sorted)
+            setPosts(sorted.slice(1))
             return
           }
         } else {
@@ -135,11 +135,11 @@ export function PostsFeed() {
             return post
           })
           
-          // Ordina per data (più recenti prima)
+          // Ordina per data (più recenti prima); escludi il primo (post del giorno)
           const sorted = processedPosts.sort((a: Post, b: Post) => 
             new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
           )
-          setPosts(sorted)
+          setPosts(sorted.slice(1))
         } catch (e) {
           console.error('Error loading posts:', e)
         }
@@ -176,7 +176,7 @@ export function PostsFeed() {
         const sorted = processedPosts.sort((a: Post, b: Post) => 
           new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
         )
-        setPosts(sorted)
+        setPosts(sorted.slice(1))
       } else {
         loadPosts()
       }
@@ -213,11 +213,11 @@ export function PostsFeed() {
     <div className="container mx-auto px-4 py-8 md:py-12">
       <div className="max-w-2xl mx-auto space-y-6">
         {posts.map((post) => (
-          <article
-            key={post.id}
-            className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden"
-          >
-            {/* Post Header */}
+          <a key={post.id} href={`/post/${post.id}`} className="block">
+            <article
+              className="bg-white dark:bg-gray-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-shadow cursor-pointer"
+            >
+              {/* Post Header */}
             <div className="flex items-center gap-3 p-4 border-b border-gray-200 dark:border-gray-700">
               <div className="relative w-10 h-10 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700 flex-shrink-0">
                 {profileImage.startsWith('data:') || profileImage.startsWith('blob:') ? (
@@ -319,8 +319,12 @@ export function PostsFeed() {
               <p className="text-gray-700 dark:text-gray-300 whitespace-pre-wrap leading-relaxed">
                 {post.description}
               </p>
+              <span className="text-sm text-blue-600 dark:text-blue-400 font-medium mt-2 inline-block">
+                Apri post →
+              </span>
             </div>
-          </article>
+            </article>
+          </a>
         ))}
       </div>
     </div>
