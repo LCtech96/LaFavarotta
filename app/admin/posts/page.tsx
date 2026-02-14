@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation'
 import { ArrowLeft, Plus, X, Trash2 } from 'lucide-react'
 import Link from 'next/link'
 import { ImageCropper } from '@/components/image-cropper'
-import { optimizeBase64Image } from '@/lib/utils'
+import { compressBase64ForUpload } from '@/lib/utils'
 
 interface Post {
   id: string
@@ -75,10 +75,9 @@ export default function AdminPosts() {
 
   const handleCropComplete = async (croppedImage: string) => {
     try {
-      // Ottimizza l'immagine base64 per Android
-      const optimized = optimizeBase64Image(croppedImage)
-      
-      // Salva nel database tramite API
+      // Comprimi per restare sotto il limite Vercel (4.5MB), utile su iPhone/foto grandi
+      const optimized = await compressBase64ForUpload(croppedImage)
+
       const response = await fetch('/api/posts', {
         method: 'POST',
         headers: {

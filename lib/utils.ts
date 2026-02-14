@@ -94,3 +94,59 @@ export function isValidBase64Image(base64: string): boolean {
   return true
 }
 
+/** Limite payload consigliato per Vercel (4.5MB) - restiamo sotto per sicurezza */
+const MAX_BASE64_CHARS = 3 * 1024 * 1024 // ~3MB base64
+
+/**
+ * Comprime un'immagine base64 per upload (es. post da iPhone).
+ * Riduce dimensioni e qualità se supera il limite, per evitare 413 su Vercel.
+ */
+export function compressBase64ForUpload(base64: string): Promise<string> {
+  if (typeof window === 'undefined') return Promise.resolve(optimizeBase64Image(base64))
+  const cleaned = optimizeBase64Image(base64)
+  if (cleaned.length <= MAX_BASE64_CHARS) return Promise.resolve(cleaned)
+
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        resolve(cleaned)
+        return
+      }
+      const maxSide = 1200
+      let w = img.width
+      let h = img.height
+      if (w > maxSide || h > maxSide) {
+        if (w > h) {
+          h = Math.round((h * maxSide) / w)
+          w = maxSide
+        } else {
+          w = Math.round((w * maxSide) / h)
+          h = maxSide
+        }
+      }
+      canvas.width = w
+      canvas.height = h
+      ctx.drawImage(img, 0, 0, w, h)
+      let quality = 0.85
+      let result = canvas.toDataURL('image/jpeg', quality)
+      while (result.length > MAX_BASE64_CHARS && quality > 0.2) {
+        quality -= 0.15
+        result = canvas.toDataURL('image/jpeg', quality)
+      }
+      if (result.length > MAX_BASE64_CHARS) {
+        canvas.width = Math.round(w * 0.7)
+        canvas.height = Math.round(h * 0.7)
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height)
+        result = canvas.toDataURL('image/jpeg', 0.6)
+      }
+      resolve(result)
+    }
+    img.onerror = () => resolve(cleaned)
+    img.src = cleaned
+  })
+}
+

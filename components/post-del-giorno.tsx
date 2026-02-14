@@ -13,9 +13,15 @@ interface Post {
 }
 
 export function PostDelGiorno() {
+  const [mounted, setMounted] = useState(false)
   const [post, setPost] = useState<Post | null>(null)
 
   useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  useEffect(() => {
+    if (!mounted) return
     const load = async () => {
       try {
         const res = await fetch('/api/posts', { cache: 'no-store' })
@@ -47,9 +53,15 @@ export function PostDelGiorno() {
     const onUpdate = () => load()
     window.addEventListener('postsUpdated', onUpdate)
     return () => window.removeEventListener('postsUpdated', onUpdate)
-  }, [])
+  }, [mounted])
 
-  if (!post) return null
+  if (!mounted || !post) return null
+
+  const dateLabel = new Date(post.createdAt).toLocaleDateString('it-IT', {
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  })
 
   return (
     <section className="container mx-auto px-4 py-6">
@@ -64,12 +76,8 @@ export function PostDelGiorno() {
               <h2 className="font-semibold text-gray-900 dark:text-white">
                 Post del giorno
               </h2>
-              <p className="text-xs text-gray-500 dark:text-gray-400">
-                {new Date(post.createdAt).toLocaleDateString('it-IT', {
-                  day: 'numeric',
-                  month: 'long',
-                  year: 'numeric',
-                })}
+              <p className="text-xs text-gray-500 dark:text-gray-400" suppressHydrationWarning>
+                {dateLabel}
               </p>
             </div>
           </div>

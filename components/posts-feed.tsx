@@ -253,7 +253,7 @@ export function PostsFeed() {
                 </h3>
                 <div className="flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400">
                   <Calendar size={12} />
-                  <span>
+                  <span suppressHydrationWarning>
                     {new Date(post.createdAt).toLocaleDateString('it-IT', {
                       day: 'numeric',
                       month: 'long',
