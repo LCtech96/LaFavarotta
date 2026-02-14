@@ -22,10 +22,19 @@ export function PostDelGiorno() {
 
   useEffect(() => {
     if (!mounted) return
-    const load = async () => {
+    const load = async (retries = 3): Promise<boolean> => {
       try {
-        const res = await fetch(`/api/posts?_=${Date.now()}`, { cache: 'no-store' })
-        if (!res.ok) return
+        const res = await fetch(`/api/posts?_=${Date.now()}`, {
+          cache: 'no-store',
+          headers: { Pragma: 'no-cache', 'Cache-Control': 'no-cache' },
+        })
+        if (!res.ok) {
+          if (retries > 0) {
+            await new Promise((r) => setTimeout(r, 1500))
+            return load(retries - 1)
+          }
+          throw new Error('API not ok')
+        }
         const data = await res.json()
         const list = data.posts
         if (Array.isArray(list) && list.length > 0) {
@@ -36,6 +45,7 @@ export function PostDelGiorno() {
             if (blob) imageUrl = blob
           }
           setPost({ ...p, imageUrl: imageUrl || p.imageUrl })
+          return true
         }
       } catch {
         const saved = typeof window !== 'undefined' ? localStorage.getItem('posts') : null
@@ -44,15 +54,25 @@ export function PostDelGiorno() {
             const parsed = JSON.parse(saved)
             if (Array.isArray(parsed) && parsed.length > 0) {
               setPost(parsed[0] as Post)
+              return true
             }
           } catch {}
         }
+        if (retries > 0) {
+          await new Promise((r) => setTimeout(r, 1500))
+          return load(retries - 1)
+        }
       }
+      return false
     }
     load()
-    const onUpdate = () => load()
+    const onUpdate = () => load(1)
     window.addEventListener('postsUpdated', onUpdate)
-    return () => window.removeEventListener('postsUpdated', onUpdate)
+    const interval = setInterval(() => load(1), 5000)
+    return () => {
+      window.removeEventListener('postsUpdated', onUpdate)
+      clearInterval(interval)
+    }
   }, [mounted])
 
   if (!mounted || !post) return null
