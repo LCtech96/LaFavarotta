@@ -1,10 +1,27 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { X } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
 import { formatPrice } from '@/lib/utils'
 import { getWhatsappUrl, getWhatsappNumber } from '@/lib/constants'
+
+const MINUTES_PREPARATION = 30
+
+/** Orario minimo di ritiro: almeno MINUTES_PREPARATION minuti da adesso */
+function getMinPickupTime(): string {
+  const min = new Date(Date.now() + MINUTES_PREPARATION * 60 * 1000)
+  return min.toTimeString().slice(0, 5)
+}
+
+/** Verifica che l'orario di ritiro sia almeno 30 minuti da adesso */
+function isPickupTimeValid(pickupTime: string): boolean {
+  const now = new Date()
+  const minPickup = new Date(now.getTime() + MINUTES_PREPARATION * 60 * 1000)
+  const [h, m] = pickupTime.split(':').map(Number)
+  const pickupDate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), h, m)
+  return pickupDate >= minPickup
+}
 
 interface OrderModalProps {
   isOpen: boolean
@@ -19,12 +36,21 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
     pickupTime: '',
     phone: '',
   })
+  const [minPickupTime, setMinPickupTime] = useState('')
+
+  useEffect(() => {
+    if (isOpen) setMinPickupTime(getMinPickupTime())
+  }, [isOpen])
 
   if (!isOpen) return null
 
   const whatsappNumber = getWhatsappNumber()
 
   const handleSubmit = () => {
+    if (!formData.pickupTime || !isPickupTimeValid(formData.pickupTime)) {
+      alert(`L'orario di ritiro deve essere almeno ${MINUTES_PREPARATION} minuti da adesso per consentire la preparazione.`)
+      return
+    }
     let message = `*Nuovo Ordine - Da Asporto*\n\n`
     
     items.forEach((item) => {
@@ -127,12 +153,13 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
               <input
                 type="time"
                 required
+                min={minPickupTime}
                 value={formData.pickupTime}
                 onChange={(e) => setFormData({ ...formData, pickupTime: e.target.value })}
                 className="w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
               />
               <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                Seleziona l&apos;orario in cui desideri ritirare l&apos;ordine al ristorante
+                L&apos;ordine può essere ritirato almeno {MINUTES_PREPARATION} minuti dopo l&apos;invio (tempo di preparazione)
               </p>
             </div>
           </div>

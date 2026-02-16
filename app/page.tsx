@@ -3,6 +3,7 @@ import { Navigation } from '@/components/navigation'
 import { Footer } from '@/components/footer'
 import { HomeHero } from '@/components/home-hero'
 import { TableBooking } from '@/components/table-booking'
+import { PostDelGiorno } from '@/components/post-del-giorno'
 import { RestaurantDescription } from '@/components/restaurant-description'
 import { PostsFeed } from '@/components/posts-feed'
 
@@ -81,6 +82,8 @@ export default function Home() {
           */}
           <HomeHero />
           <TableBooking />
+          {/* Post del giorno: visibile subito sotto "Prenota un tavolo", sopra "Benvenuti..." */}
+          <PostDelGiorno />
           <RestaurantDescription />
           <PostsFeed />
         </div>
