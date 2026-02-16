@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 
-// GET - Recupera la foto del titolare
+const OWNER_DISPLAY_NAME = 'Andriolo Salvatore'
+const OWNER_DISPLAY_DESCRIPTION = 'Andriolo Salvatore, pizzaiolo e titolare, porta avanti con passione la tradizione dello street food palermitano e della pizza a Terrasini. Conduzione familiare nel cuore di Terrasini, vicino all\'aeroporto Falcone e Borsellino.'
+
+// GET - Recupera la foto del titolare (nome sempre Andriolo Salvatore)
 export async function GET(request: NextRequest) {
   try {
     if (!prisma) {
@@ -21,8 +24,8 @@ export async function GET(request: NextRequest) {
       return NextResponse.json(
         { 
           imageUrl: owner.imageUrl,
-          name: owner.name,
-          description: owner.description
+          name: OWNER_DISPLAY_NAME,
+          description: OWNER_DISPLAY_DESCRIPTION
         },
         {
           headers: {
@@ -43,8 +46,8 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(
       { 
         imageUrl: content?.value || null,
-        name: null,
-        description: null
+        name: OWNER_DISPLAY_NAME,
+        description: OWNER_DISPLAY_DESCRIPTION
       },
       {
         headers: {
@@ -67,7 +70,7 @@ export async function GET(request: NextRequest) {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { imageUrl, name, description } = body
+    const { imageUrl } = body
 
     if (!imageUrl || typeof imageUrl !== 'string') {
       return NextResponse.json(
@@ -88,15 +91,19 @@ export async function POST(request: NextRequest) {
       where: { role: 'Titolare' }
     })
 
+    // Nome e descrizione sempre Andriolo Salvatore (sovrascrivono eventuali valori obsoleti)
+    const ownerName = OWNER_DISPLAY_NAME
+    const ownerDescription = OWNER_DISPLAY_DESCRIPTION
+
     let owner
     if (existingOwner) {
-      // Aggiorna il titolare esistente
+      // Aggiorna il titolare esistente (sovrascrive immagine e nome/descrizione)
       owner = await prisma.staff.update({
         where: { id: existingOwner.id },
         data: { 
           imageUrl,
-          name: name || existingOwner.name,
-          description: description || existingOwner.description
+          name: ownerName,
+          description: ownerDescription
         },
         select: { id: true, imageUrl: true, name: true, description: true }
       })
@@ -104,9 +111,9 @@ export async function POST(request: NextRequest) {
       // Crea un nuovo titolare
       owner = await prisma.staff.create({
         data: {
-          name: name || 'Andriolo Salvatore',
+          name: ownerName,
           role: 'Titolare',
-          description: description || 'Andriolo Salvatore, pizzaiolo e titolare, porta avanti con passione la tradizione dello street food palermitano e della pizza a Terrasini. Conduzione familiare nel cuore di Terrasini, vicino all\'aeroporto Falcone e Borsellino.',
+          description: ownerDescription,
           imageUrl
         },
         select: { id: true, imageUrl: true, name: true, description: true }

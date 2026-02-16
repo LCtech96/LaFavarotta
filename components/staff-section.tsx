@@ -50,6 +50,7 @@ export function StaffSection() {
             
             if (data.name) setOwnerName(data.name)
             if (data.description) setOwnerDescription(data.description)
+            // Nome e descrizione sono sempre Andriolo Salvatore (impostati dall'API)
             setIsLoading(false)
             return
           }

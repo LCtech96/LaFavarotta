@@ -11,6 +11,12 @@ export default function AdminGeneralImages() {
   const [isAuthenticated, setIsAuthenticated] = useState(false)
   const [croppingImage, setCroppingImage] = useState<string | null>(null)
   const [croppingType, setCroppingType] = useState<'cover' | 'profile' | 'owner' | null>(null)
+  const [currentImages, setCurrentImages] = useState<{ cover: string | null; profile: string | null; owner: string | null }>({
+    cover: null,
+    profile: null,
+    owner: null
+  })
+  const [loadingImages, setLoadingImages] = useState(true)
   const router = useRouter()
 
   useEffect(() => {
@@ -21,6 +27,44 @@ export default function AdminGeneralImages() {
       setIsAuthenticated(true)
     }
   }, [router])
+
+  // Carica le immagini attualmente visibili (stesso stato del sito) per mostrarle e permettere sovrascrittura
+  useEffect(() => {
+    if (!isAuthenticated) return
+
+    const loadCurrentImages = async () => {
+      setLoadingImages(true)
+      const images = { cover: null as string | null, profile: null as string | null, owner: null as string | null }
+
+      try {
+        const [coverRes, profileRes, ownerRes] = await Promise.all([
+          fetch('/api/images/general?type=cover', { cache: 'no-store' }),
+          fetch('/api/images/general?type=profile', { cache: 'no-store' }),
+          fetch('/api/staff/owner', { cache: 'no-store' })
+        ])
+
+        const coverData = coverRes.ok ? await coverRes.json() : null
+        const profileData = profileRes.ok ? await profileRes.json() : null
+        const ownerData = ownerRes.ok ? await ownerRes.json() : null
+
+        if (coverData?.imageUrl) images.cover = coverData.imageUrl
+        if (profileData?.imageUrl) images.profile = profileData.imageUrl
+        if (ownerData?.imageUrl) images.owner = ownerData.imageUrl
+
+        // Fallback localStorage se il DB non ha ancora l'immagine
+        if (!images.cover && typeof window !== 'undefined') images.cover = localStorage.getItem('cover_image')
+        if (!images.profile && typeof window !== 'undefined') images.profile = localStorage.getItem('profile_image')
+        if (!images.owner && typeof window !== 'undefined') images.owner = localStorage.getItem('owner_image')
+      } catch (e) {
+        console.error('Error loading current images:', e)
+      }
+
+      setCurrentImages(images)
+      setLoadingImages(false)
+    }
+
+    loadCurrentImages()
+  }, [isAuthenticated])
 
   const handleFileSelect = (type: 'cover' | 'profile' | 'owner', file: File) => {
     const reader = new FileReader()
@@ -84,6 +128,12 @@ export default function AdminGeneralImages() {
         }))
       }
 
+      // Aggiorna l'anteprima nell'admin (sovrascrittura visibile subito)
+      setCurrentImages((prev) => ({
+        ...prev,
+        ...(croppingType === 'owner' ? { owner: optimized } : { [croppingType]: optimized })
+      }))
+
       // Reset
       setCroppingImage(null)
       setCroppingType(null)
@@ -119,9 +169,13 @@ export default function AdminGeneralImages() {
           Immagini Generali
         </h1>
 
+        {loadingImages && (
+          <p className="text-gray-600 dark:text-gray-400 mb-6">Caricamento immagini attuali...</p>
+        )}
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {/* Cover Image */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 ${currentImages.cover ? 'ring-2 ring-green-500 ring-opacity-50' : ''}`}>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Immagine Copertina
             </h2>
@@ -131,28 +185,38 @@ export default function AdminGeneralImages() {
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
-                  if (file) {
-                    handleFileSelect('cover', file)
-                  }
+                  if (file) handleFileSelect('cover', file)
                 }}
                 className="hidden"
                 id="cover-image"
               />
               <label
                 htmlFor="cover-image"
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${currentImages.cover ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
               >
                 <Upload size={16} />
-                Carica e ritaglia copertina
+                {currentImages.cover ? 'Sostituisci copertina' : 'Carica e ritaglia copertina'}
               </label>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            {currentImages.cover && (
+              <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700">
+                <img
+                  src={currentImages.cover}
+                  alt="Copertina attuale"
+                  className="w-full h-28 object-cover"
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">Immagine attualmente visibile in homepage</p>
+              </div>
+            )}
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
               Proporzione consigliata: 3:1 (larghezza:altezza)
             </p>
           </div>
 
           {/* Profile Image */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 ${currentImages.profile ? 'ring-2 ring-green-500 ring-opacity-50' : ''}`}>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
               Immagine Profilo
             </h2>
@@ -162,30 +226,40 @@ export default function AdminGeneralImages() {
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
-                  if (file) {
-                    handleFileSelect('profile', file)
-                  }
+                  if (file) handleFileSelect('profile', file)
                 }}
                 className="hidden"
                 id="profile-image"
               />
               <label
                 htmlFor="profile-image"
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${currentImages.profile ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
               >
                 <Upload size={16} />
-                Carica e ritaglia profilo
+                {currentImages.profile ? 'Sostituisci profilo' : 'Carica e ritaglia profilo'}
               </label>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            {currentImages.profile && (
+              <div className="mt-3 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 w-24 h-24">
+                <img
+                  src={currentImages.profile}
+                  alt="Profilo attuale"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => { e.currentTarget.style.display = 'none' }}
+                />
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">Immagine attualmente visibile</p>
+              </div>
+            )}
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
               Proporzione consigliata: 1:1 (quadrata)
             </p>
           </div>
 
           {/* Owner Photo */}
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-md p-6 ${currentImages.owner ? 'ring-2 ring-green-500 ring-opacity-50' : ''}`}>
             <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-4">
-              Foto del Titolare
+              Foto del Titolare (Andriolo Salvatore)
             </h2>
             <div className="mb-4">
               <input
@@ -193,22 +267,34 @@ export default function AdminGeneralImages() {
                 accept="image/*"
                 onChange={(e) => {
                   const file = e.target.files?.[0]
-                  if (file) {
-                    handleFileSelect('owner', file)
-                  }
+                  if (file) handleFileSelect('owner', file)
                 }}
                 className="hidden"
                 id="owner-image"
               />
               <label
                 htmlFor="owner-image"
-                className="flex items-center justify-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors cursor-pointer"
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-lg transition-colors cursor-pointer ${currentImages.owner ? 'bg-green-600 hover:bg-green-700' : 'bg-blue-600 hover:bg-blue-700'} text-white`}
               >
                 <Upload size={16} />
-                Carica e ritaglia foto
+                {currentImages.owner ? 'Sostituisci foto titolare' : 'Carica e ritaglia foto'}
               </label>
             </div>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
+            {currentImages.owner && (
+              <div className="mt-3">
+                <div className="w-24 h-24 rounded-full overflow-hidden border-2 border-gray-200 dark:border-gray-700">
+                  <img
+                    src={currentImages.owner}
+                    alt="Titolare attuale"
+                    className="w-full h-full object-cover"
+                    loading="lazy"
+                    onError={(e) => { e.currentTarget.style.display = 'none' }}
+                  />
+                </div>
+                <p className="text-xs text-green-600 dark:text-green-400 mt-1">Foto attualmente visibile in Chi siamo</p>
+              </div>
+            )}
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-2">
               Proporzione consigliata: 1:1 (quadrata)
             </p>
           </div>
