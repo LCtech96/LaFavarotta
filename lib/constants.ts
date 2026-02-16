@@ -1,10 +1,11 @@
 /**
  * Contatti e indirizzo predefiniti.
+ * WhatsApp 3792675864 usato per prenotazione tavolo e ordinazioni.
  * Sovrascrivibili con variabili d'ambiente NEXT_PUBLIC_*.
  */
 export const DEFAULT_ADDRESS = 'Via R. Ruffino, 9, 90049 Terrasini PA'
 export const DEFAULT_PHONE = '+39 379 267 5864'
-export const DEFAULT_PHONE_RAW = '+393792675864'
+export const DEFAULT_PHONE_RAW = '393792675864'
 export const DEFAULT_WHATSAPP_URL = 'https://wa.me/393792675864'
 export const DEFAULT_MAPS_URL = 'https://maps.app.goo.gl/2ZQ74WrGo7Xe3bEBA?g_st=ic'
 

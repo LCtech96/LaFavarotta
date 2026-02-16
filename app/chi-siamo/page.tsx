@@ -9,12 +9,12 @@ const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'https://mancia-e-statti-zit
 
 export const metadata: Metadata = {
   title: "Chi Siamo - Street food palermitano Terrasini | Mancia e statti zitto da Sasà",
-  description: "Street food palermitano a conduzione familiare nel cuore di Terrasini. Il pizzaiolo e titolare Massimiliano Andriolo e il nostro staff. Vicino aeroporto Falcone e Borsellino.",
+  description: "Street food palermitano a conduzione familiare nel cuore di Terrasini. Il pizzaiolo e titolare Andriolo Salvatore e il nostro staff. Vicino aeroporto Falcone e Borsellino.",
   keywords: [
     "chi siamo",
     "street food Terrasini",
     "conduzione familiare",
-    "Massimiliano Andriolo",
+    "Andriolo Salvatore",
     "pizzaiolo Terrasini",
     "staff Terrasini",
     "Mancia e statti zitto da Sasà",

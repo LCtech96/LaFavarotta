@@ -30,9 +30,9 @@ export const metadata: Metadata = {
     "cena Terrasini",
     "pranzo Terrasini",
   ],
-  authors: [{ name: "Nome" }],
-  creator: "Nome",
-  publisher: "Nome",
+  authors: [{ name: "Andriolo Salvatore" }],
+  creator: "Andriolo Salvatore",
+  publisher: "Andriolo Salvatore",
   formatDetection: {
     email: false,
     address: false,

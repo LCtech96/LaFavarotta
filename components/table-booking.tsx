@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { Calendar, Clock, Users, MessageCircle } from 'lucide-react'
+import { getWhatsappUrl, getWhatsappNumber } from '@/lib/constants'
 
 export function TableBooking() {
   const [isOpen, setIsOpen] = useState(false)
@@ -15,8 +16,8 @@ export function TableBooking() {
     notes: '',
   })
 
-  const whatsappUrl = 'https://wa.me/393792675864'
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+39 379 267 5864'
+  const whatsappUrl = getWhatsappUrl()
+  const whatsappNumber = getWhatsappNumber()
 
   // Ottieni la data minima (oggi)
   const getMinDate = () => {

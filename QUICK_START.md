@@ -21,7 +21,7 @@ Crea un file `.env` nella root del progetto con questa connection string:
 
 ```env
 DATABASE_URL="postgresql://neondb_owner:npg_o2iTpUByG3Wn@ep-crimson-king-a4292tbj-pooler.us-east-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require"
-NEXT_PUBLIC_WHATSAPP_NUMBER="+393276976442"
+NEXT_PUBLIC_WHATSAPP_NUMBER="+393792675864"
 NEXT_PUBLIC_EMAIL="Mancia e statti zitto da Sasà@gmail.com"
 NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristoranteMancia e statti zitto da Sasàterrasini/?locale=it_IT"
 NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/Mancia e statti zitto da Sasà_ristorante_terras"

@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { X } from 'lucide-react'
 import { useCartStore } from '@/store/cart-store'
 import { formatPrice } from '@/lib/utils'
+import { getWhatsappUrl, getWhatsappNumber } from '@/lib/constants'
 
 interface OrderModalProps {
   isOpen: boolean
@@ -21,7 +22,7 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
 
   if (!isOpen) return null
 
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || '+39 379 267 5864'
+  const whatsappNumber = getWhatsappNumber()
 
   const handleSubmit = () => {
     let message = `*Nuovo Ordine - Da Asporto*\n\n`
@@ -47,7 +48,7 @@ export function OrderModal({ isOpen, onClose }: OrderModalProps) {
     }
     message += `\n*Nota: Il ritiro deve essere effettuato presso il ristorante. Non effettuiamo consegne a domicilio.*\n`
 
-    const whatsappUrl = `https://wa.me/${whatsappNumber.replace(/[^0-9]/g, '')}?text=${encodeURIComponent(message)}`
+    const whatsappUrl = `${getWhatsappUrl()}?text=${encodeURIComponent(message)}`
     window.open(whatsappUrl, '_blank')
     clearCart()
     onClose()

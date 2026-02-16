@@ -9,9 +9,9 @@ export function StaffSection() {
   const [ownerImage, setOwnerImage] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [fullscreenOwner, setFullscreenOwner] = useState(false)
-  const [ownerName, setOwnerName] = useState<string>('Massimiliano Andriolo')
+  const [ownerName, setOwnerName] = useState<string>('Andriolo Salvatore')
   const [ownerDescription, setOwnerDescription] = useState<string>(
-    'Massimiliano Andriolo, pizzaiolo e titolare, porta avanti con passione la tradizione dello street food palermitano e della pizza a Terrasini. Conduzione familiare nel cuore di Terrasini, vicino all\'aeroporto Falcone e Borsellino.'
+    'Andriolo Salvatore, pizzaiolo e titolare, porta avanti con passione la tradizione dello street food palermitano e della pizza a Terrasini. Conduzione familiare nel cuore di Terrasini, vicino all\'aeroporto Falcone e Borsellino.'
   )
 
   useEffect(() => {
@@ -178,7 +178,7 @@ export function StaffSection() {
         </div>
       </section>
 
-      {/* Lightbox immagine Massimiliano */}
+      {/* Lightbox immagine titolare */}
       {fullscreenOwner && ownerImage && (
         <div
           className="fixed inset-0 z-50 bg-black/95 flex items-center justify-center"

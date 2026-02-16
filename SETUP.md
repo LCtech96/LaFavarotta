@@ -32,7 +32,7 @@ Assicurati di avere tutte le variabili d'ambiente configurate nel file `.env`:
 
 ```env
 DATABASE_URL="..."
-NEXT_PUBLIC_WHATSAPP_NUMBER="+393276976442"
+NEXT_PUBLIC_WHATSAPP_NUMBER="+393792675864"
 NEXT_PUBLIC_EMAIL="Mancia e statti zitto da Sasà@gmail.com"
 NEXT_PUBLIC_FACEBOOK_URL="https://www.facebook.com/ristoranteMancia e statti zitto da Sasàterrasini/?locale=it_IT"
 NEXT_PUBLIC_INSTAGRAM_URL="https://www.instagram.com/Mancia e statti zitto da Sasà_ristorante_terras"

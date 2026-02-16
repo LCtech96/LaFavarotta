@@ -104,9 +104,9 @@ export async function POST(request: NextRequest) {
       // Crea un nuovo titolare
       owner = await prisma.staff.create({
         data: {
-          name: name || 'Leone Vincenzo',
+          name: name || 'Andriolo Salvatore',
           role: 'Titolare',
-          description: description || 'Con una passione per la cucina che dura da oltre vent\'anni, Leone Vincenzo ha trasformato Mancia e statti zitto da Sasà in un punto di riferimento per la gastronomia siciliana.',
+          description: description || 'Andriolo Salvatore, pizzaiolo e titolare, porta avanti con passione la tradizione dello street food palermitano e della pizza a Terrasini. Conduzione familiare nel cuore di Terrasini, vicino all\'aeroporto Falcone e Borsellino.',
           imageUrl
         },
         select: { id: true, imageUrl: true, name: true, description: true }
