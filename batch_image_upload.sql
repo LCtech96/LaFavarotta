@@ -70,7 +70,10 @@ COMMIT;
 -- Crea una funzione helper per batch insert (opzionale)
 CREATE OR REPLACE FUNCTION batch_insert_menu_images(
   images JSONB
-) RETURNS INTEGER AS $$
+) RETURNS INTEGER
+LANGUAGE plpgsql
+SET search_path = public
+AS $$
 DECLARE
   img JSONB;
   inserted_count INTEGER := 0;
@@ -96,7 +99,7 @@ BEGIN
   
   RETURN inserted_count;
 END;
-$$ LANGUAGE plpgsql;
+$$;
 
 -- Esempio di uso della funzione:
 -- SELECT batch_insert_menu_images('[

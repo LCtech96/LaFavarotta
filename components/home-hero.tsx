@@ -10,121 +10,81 @@ export function HomeHero() {
   const [restaurantSubtitle, setRestaurantSubtitle] = useState('Street food palermitano a conduzione familiare nel cuore di Terrasini (PA). Via R. Ruffino, 9 — vicino all\'aeroporto Falcone e Borsellino.')
   
   const [coverImage, setCoverImage] = useState('/copertina.png.jpg')
-  const [profileImage, setProfileImage] = useState<string | null>(null)
-  const [isProfileLoading, setIsProfileLoading] = useState<boolean>(true)
+  const [profileImage, setProfileImage] = useState<string>('/sasa.png.jpg')
   const [fullscreenImage, setFullscreenImage] = useState<'cover' | 'profile' | null>(null)
   const coverBlobUrlRef = useRef<string | null>(null)
   const profileBlobUrlRef = useRef<string | null>(null)
 
   const loadImages = async () => {
-    try {
-      const coverResponse = await fetch('/api/images/general?type=cover', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      })
-      if (coverResponse.ok) {
-        const coverData = await coverResponse.json()
-        if (coverData.imageUrl) {
-          const savedCover = coverData.imageUrl
-          localStorage.setItem('cover_image', savedCover)
-         
-          if (isAndroid() && savedCover.startsWith('data:image')) {
-            const blobUrl = base64ToBlobUrl(savedCover)
-            if (blobUrl) {
-              if (coverBlobUrlRef.current) {
-                URL.revokeObjectURL(coverBlobUrlRef.current)
-              }
-              coverBlobUrlRef.current = blobUrl
-              setCoverImage(blobUrl)
-            } else {
-              setCoverImage(savedCover)
-            }
-          } else {
-            setCoverImage(savedCover)
-          }
-        }
+    const noCache = {
+      cache: 'no-store' as RequestCache,
+      headers: {
+        'Cache-Control': 'no-cache, no-store, must-revalidate',
+        'Pragma': 'no-cache',
+        'Expires': '0'
       }
-    } catch (error) {
-      console.error('Error loading cover image:', error)
-      const savedCover = localStorage.getItem('cover_image')
-      if (savedCover) {
-        if (isAndroid() && savedCover.startsWith('data:image')) {
-          const blobUrl = base64ToBlobUrl(savedCover)
-          if (blobUrl) {
-            if (coverBlobUrlRef.current) {
-              URL.revokeObjectURL(coverBlobUrlRef.current)
+    }
+
+    const loadCover = async () => {
+      try {
+        const res = await fetch('/api/images/general?type=cover', noCache)
+        if (!res.ok) return
+        const data = await res.json()
+        if (data.imageUrl) {
+          const saved = data.imageUrl
+          localStorage.setItem('cover_image', saved)
+          if (isAndroid() && saved.startsWith('data:image')) {
+            const blob = base64ToBlobUrl(saved)
+            if (blob) {
+              if (coverBlobUrlRef.current) URL.revokeObjectURL(coverBlobUrlRef.current)
+              coverBlobUrlRef.current = blob
+              setCoverImage(blob)
+            } else setCoverImage(saved)
+          } else setCoverImage(saved)
+        }
+      } catch (e) {
+        console.error('Error loading cover:', e)
+        const saved = localStorage.getItem('cover_image')
+        if (saved) setCoverImage(saved)
+      }
+    }
+
+    const loadProfile = async () => {
+      try {
+        const res = await fetch('/api/images/general?type=profile', noCache)
+        if (!res.ok) throw new Error('not ok')
+        const data = await res.json()
+        if (data.imageUrl) {
+          const saved = data.imageUrl
+          localStorage.setItem('profile_image', saved)
+          let url = saved
+          if (isAndroid() && saved.startsWith('data:image')) {
+            const blob = base64ToBlobUrl(saved)
+            if (blob) {
+              if (profileBlobUrlRef.current) URL.revokeObjectURL(profileBlobUrlRef.current)
+              profileBlobUrlRef.current = blob
+              url = blob
             }
-            coverBlobUrlRef.current = blobUrl
-            setCoverImage(blobUrl)
-          } else {
-            setCoverImage(savedCover)
           }
-        } else {
-          setCoverImage(savedCover)
+          setProfileImage(url)
+        }
+      } catch (e) {
+        console.error('Error loading profile:', e)
+        const saved = localStorage.getItem('profile_image')
+        if (saved) {
+          if (isAndroid() && saved.startsWith('data:image')) {
+            const blob = base64ToBlobUrl(saved)
+            if (blob) {
+              if (profileBlobUrlRef.current) URL.revokeObjectURL(profileBlobUrlRef.current)
+              profileBlobUrlRef.current = blob
+              setProfileImage(blob)
+            } else setProfileImage(saved)
+          } else setProfileImage(saved)
         }
       }
     }
 
-    setIsProfileLoading(true)
-    try {
-      const profileResponse = await fetch('/api/images/general?type=profile', {
-        cache: 'no-store',
-        headers: {
-          'Cache-Control': 'no-cache, no-store, must-revalidate',
-          'Pragma': 'no-cache',
-          'Expires': '0'
-        }
-      })
-      if (profileResponse.ok) {
-        const profileData = await profileResponse.json()
-        if (profileData.imageUrl) {
-          const savedProfile = profileData.imageUrl
-          let finalProfileUrl = savedProfile
-          if (isAndroid() && savedProfile.startsWith('data:image')) {
-            const blobUrl = base64ToBlobUrl(savedProfile)
-            if (blobUrl) {
-              if (profileBlobUrlRef.current) {
-                URL.revokeObjectURL(profileBlobUrlRef.current)
-              }
-              profileBlobUrlRef.current = blobUrl
-              finalProfileUrl = blobUrl
-            }
-          }
-          setProfileImage(finalProfileUrl)
-          localStorage.setItem('profile_image', savedProfile)
-          setIsProfileLoading(false)
-          return
-        }
-      }
-    } catch (error) {
-      console.error('Error loading profile image:', error)
-    }
-
-    const savedProfile = localStorage.getItem('profile_image')
-    if (savedProfile) {
-      if (isAndroid() && savedProfile.startsWith('data:image')) {
-        const blobUrl = base64ToBlobUrl(savedProfile)
-        if (blobUrl) {
-          if (profileBlobUrlRef.current) {
-            URL.revokeObjectURL(profileBlobUrlRef.current)
-          }
-          profileBlobUrlRef.current = blobUrl
-          setProfileImage(blobUrl)
-        } else {
-          setProfileImage(savedProfile)
-        }
-      } else {
-        setProfileImage(savedProfile)
-      }
-    } else {
-      // MODIFICATO: Impostiamo il tuo file reale come profilo predefinito
-      setProfileImage('/sasa.png.jpg')
-    }
-    setIsProfileLoading(false)
+    await Promise.all([loadCover(), loadProfile()])
   }
 
   useEffect(() => {
@@ -203,21 +163,18 @@ export function HomeHero() {
       <div className="relative -mt-16 md:-mt-24 pb-8 max-w-7xl mx-auto px-4 flex flex-col items-center justify-center text-center bg-white/95 dark:bg-transparent py-4 rounded-t-2xl">
         <button
           type="button"
-          onClick={() => profileImage && setFullscreenImage('profile')}
+          onClick={() => setFullscreenImage('profile')}
           className="relative w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white dark:border-white overflow-hidden shadow-xl bg-gray-200 flex-shrink-0 ring-2 ring-gray-200 dark:ring-gray-700 cursor-pointer border-0 p-0"
           aria-label="Apri immagine profilo a schermo intero"
-          disabled={!profileImage}
         >
-          {!isProfileLoading && profileImage && (
-            <Image
-              src={profileImage}
-              alt="Sasà"
-              fill
-              className="object-cover"
-              priority
-              sizes="128px"
-            />
-          )}
+          <Image
+            src={profileImage}
+            alt="Sasà"
+            fill
+            className="object-cover"
+            priority
+            sizes="128px"
+          />
         </button>
         <h1 className="text-3xl md:text-5xl font-bold mt-4 mb-2 text-gray-900 dark:text-white drop-shadow-none dark:drop-shadow-lg">
           {restaurantName}
