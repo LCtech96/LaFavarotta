@@ -68,10 +68,8 @@ export function PostDelGiorno() {
     load()
     const onUpdate = () => load(1)
     window.addEventListener('postsUpdated', onUpdate)
-    const interval = setInterval(() => load(1), 5000)
     return () => {
       window.removeEventListener('postsUpdated', onUpdate)
-      clearInterval(interval)
     }
   }, [mounted])
 
